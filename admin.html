@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin Dashboard | M-TECH Premium Gadget Store</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0b0b0c">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/responsive.css">
+<link rel="stylesheet" href="css/animations.css">
+<script>
+window.MTECH_IMG={
+  ok:function(i){var w=i.closest(".thumb")||i.parentElement;if(w)w.classList.add("is-loaded");},
+  fail:function(i){var w=i.closest(".thumb")||i.parentElement;i.style.display="none";if(w){w.classList.remove("is-loaded");w.classList.add("img-missing");}}
+};
+</script>
+<style>
+  body{background:var(--off)}
+  .admin-shell{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
+
+  /* Sidebar */
+  .admin-side{
+    background:var(--ink);color:#fff;padding:22px 16px;position:sticky;top:0;height:100vh;
+    overflow-y:auto;display:flex;flex-direction:column;gap:6px
+  }
+  .admin-side .brand-name{color:#fff}
+  .admin-side .brand{margin-bottom:22px;padding:0 6px}
+  .side-group{font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.42);
+    font-weight:700;margin:18px 0 6px;padding:0 10px}
+  .side-link{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 12px;border-radius:10px;
+    font-size:.9rem;font-weight:560;color:rgba(255,255,255,.74);cursor:pointer;border:0;background:none;
+    width:100%;text-align:left;transition:background .18s ease,color .18s ease;font-family:var(--font)
+  }
+  .side-link:hover{background:rgba(255,255,255,.08);color:#fff}
+  .side-link.is-active{background:#fff;color:var(--ink);font-weight:720}
+  .side-count{
+    font-size:.66rem;font-weight:800;background:var(--wa);color:#fff;border-radius:999px;
+    padding:2px 8px;min-width:20px;text-align:center
+  }
+
+  /* Main */
+  .admin-main{padding:26px 30px 70px;max-width:100%;overflow-x:hidden}
+  .admin-top{
+    display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;
+    margin-bottom:26px;padding-bottom:18px;border-bottom:1px solid var(--line)
+  }
+  .admin-burger{display:none}
+
+  /* Panels */
+  .admin-panel{display:none}
+  .admin-panel.is-active{display:block;animation:mtechFadeUp .35s ease both}
+
+  /* Stats */
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px}
+  .stat-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px}
+  .stat-card b{display:block;font-family:var(--font-serif);font-size:2rem;line-height:1;margin-bottom:4px}
+  .stat-card span{font-size:.76rem;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);font-weight:700}
+
+  /* Table */
+  .adm-table{width:100%;border-collapse:collapse;font-size:.88rem;background:#fff}
+  .adm-table th{
+    text-align:left;padding:12px 14px;background:var(--off);font-size:.68rem;letter-spacing:.11em;
+    text-transform:uppercase;color:var(--ink-55);font-weight:700;white-space:nowrap
+  }
+  .adm-table td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+  .adm-table tr:last-child td{border-bottom:0}
+  .adm-thumb{width:46px;height:46px;border-radius:9px;object-fit:contain;background:var(--off);padding:4px;flex:none}
+  .pill-status{font-size:.64rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+    padding:4px 9px;border-radius:999px;white-space:nowrap;display:inline-block}
+  .s-published,.s-accepted,.s-approved,.s-completed{background:#e6f6ec;color:#166b3c}
+  .s-draft,.s-hidden,.s-pending{background:var(--off-2);color:var(--ink-55)}
+  .s-new{background:#e7f0fd;color:#14459e}
+  .s-reviewing,.s-limited_stock,.s-contacted{background:#fff3e0;color:#8a4b00}
+  .s-out_of_stock,.s-rejected{background:#fdecea;color:#95271f}
+
+  .icon-btn{
+    border:1px solid var(--line-strong);background:#fff;border-radius:8px;padding:5px 9px;font-size:.72rem;
+    cursor:pointer;font-weight:600;white-space:nowrap;transition:all .15s ease;font-family:var(--font)
+  }
+  .icon-btn:hover{border-color:var(--ink);background:var(--ink);color:#fff}
+  .icon-btn.danger:hover{background:#95271f;border-color:#95271f}
+
+  /* Drawer (add/edit forms + request detail) */
+  .drawer{position:fixed;inset:0;z-index:1000;display:none}
+  .drawer.is-open{display:block}
+  .drawer-back{position:absolute;inset:0;background:rgba(11,11,12,.55);backdrop-filter:blur(4px)}
+  .drawer-body{
+    position:absolute;right:0;top:0;bottom:0;width:min(680px,100%);background:#fff;overflow-y:auto;
+    padding:28px;box-shadow:var(--shadow-lg);animation:mtechFadeUp .3s ease both
+  }
+  .drawer-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:22px}
+
+  .spec-row{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:8px}
+
+  /* Notifications */
+  .notif-wrap{position:relative}
+  .notif-btn{
+    width:42px;height:42px;border-radius:12px;border:1px solid var(--line-strong);background:#fff;
+    cursor:pointer;display:grid;place-items:center;font-size:1.05rem;position:relative
+  }
+  .notif-dot{
+    position:absolute;top:-5px;right:-5px;background:#e0245e;color:#fff;font-size:.62rem;font-weight:800;
+    border-radius:999px;min-width:19px;height:19px;display:grid;place-items:center;padding:0 5px
+  }
+  .notif-panel{
+    position:absolute;right:0;top:52px;width:min(360px,88vw);background:#fff;border:1px solid var(--line);
+    border-radius:var(--radius-sm);box-shadow:var(--shadow-lg);max-height:400px;overflow-y:auto;
+    display:none;z-index:50
+  }
+  .notif-panel.is-open{display:block}
+  .notif-item{padding:14px 16px;border-bottom:1px solid var(--line);font-size:.85rem}
+  .notif-item.unread{background:#f5f9ff}
+
+  .gate{min-height:100vh;display:grid;place-items:center;padding:26px;text-align:center}
+
+  @media (max-width:900px){
+    .admin-shell{grid-template-columns:1fr}
+    .admin-side{
+      position:fixed;left:0;top:0;bottom:0;width:270px;z-index:950;transform:translateX(-100%);
+      transition:transform .28s ease
+    }
+    .admin-side.is-open{transform:translateX(0)}
+    .admin-burger{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;
+      border:1px solid var(--line-strong);background:#fff;cursor:pointer;font-size:1.1rem}
+    .admin-main{padding:18px 16px 80px}
+    .drawer-body{width:100%;padding:20px}
+    .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+    .adm-table{min-width:640px}
+    .stat-card b{font-size:1.7rem}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== ACCESS GATE ===================== -->
+<div class="gate" id="gate">
+  <div>
+    <div class="brand" style="justify-content:center;margin-bottom:20px">
+      <span class="brand-mark" aria-hidden="true">M</span>
+      <span class="brand-text" style="text-align:left">
+        <span class="brand-name">M-TECH</span>
+        <span class="brand-sub">Admin Console</span>
+      </span>
+    </div>
+    <h2 id="gate-title" style="margin-bottom:10px">Checking your access…</h2>
+    <p class="lede" id="gate-msg" style="max-width:44ch;margin-inline:auto">Verifying your M-TECH administrator permissions.</p>
+    <div class="btn-row" id="gate-actions" style="justify-content:center;display:none">
+      <a class="btn btn--dark" href="login.html">Log in as admin</a>
+      <a class="btn btn--ghost" href="index.html">Back to store</a>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== DASHBOARD ===================== -->
+<div class="admin-shell" id="shell" style="display:none">
+
+  <!-- Sidebar -->
+  <aside class="admin-side" id="side">
+    <a class="brand" href="index.html">
+      <span class="brand-mark" aria-hidden="true">M</span>
+      <span class="brand-text">
+        <span class="brand-name">M-TECH</span>
+        <span class="brand-sub">Admin</span>
+      </span>
+    </a>
+
+    <p class="side-group">Overview</p>
+    <button class="side-link is-active" data-panel="p-overview">Dashboard</button>
+
+    <p class="side-group">Catalogue</p>
+    <button class="side-link" data-panel="p-products">Products <span class="side-count" id="c-products">0</span></button>
+    <button class="side-link" data-panel="p-categories">Categories</button>
+
+    <p class="side-group">Requests</p>
+    <button class="side-link" data-panel="p-sell">Sell Requests <span class="side-count" id="c-sell">0</span></button>
+    <button class="side-link" data-panel="p-swap">Swap Requests <span class="side-count" id="c-swap">0</span></button>
+    <button class="side-link" data-panel="p-enquiries">Enquiries <span class="side-count" id="c-enq">0</span></button>
+
+    <p class="side-group">Content</p>
+    <button class="side-link" data-panel="p-testimonials">Testimonials</button>
+    <button class="side-link" data-panel="p-promotions">Promotions</button>
+    <button class="side-link" data-panel="p-settings">Site Settings</button>
+
+    <div style="margin-top:auto;padding-top:22px">
+      <a class="side-link" href="index.html" style="text-decoration:none">&larr; View storefront</a>
+      <button class="side-link js-logout" style="color:#ff9d95">Log out</button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="admin-main">
+    <div class="admin-top">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="admin-burger" id="burger" aria-label="Open admin menu">&#9776;</button>
+        <div>
+          <h1 id="panel-title" style="font-size:1.6rem">Dashboard</h1>
+          <p class="tiny muted" id="admin-who">—</p>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="notif-wrap">
+          <button class="notif-btn" id="notif-btn" aria-label="Notifications">&#128276;<span class="notif-dot" id="notif-dot" style="display:none">0</span></button>
+          <div class="notif-panel" id="notif-panel">
+            <div style="padding:12px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center">
+              <b style="font-size:.8rem">Notifications</b>
+              <button class="icon-btn" id="mark-all-read">Mark all read</button>
+            </div>
+            <div id="notif-list"><div class="notif-item muted">Loading…</div></div>
+          </div>
+        </div>
+        <a class="btn btn--wa btn--sm" data-wa href="#">WhatsApp</a>
+      </div>
+    </div>
+
+    <!-- ---------------- OVERVIEW ---------------- -->
+    <section class="admin-panel is-active" id="p-overview">
+      <div class="stat-grid" id="stat-grid">
+        <div class="stat-card"><b id="s-total">–</b><span>Total products</span></div>
+        <div class="stat-card"><b id="s-avail">–</b><span>Available</span></div>
+        <div class="stat-card"><b id="s-out">–</b><span>Out of stock</span></div>
+        <div class="stat-card"><b id="s-feat">–</b><span>Featured</span></div>
+        <div class="stat-card"><b id="s-sell">–</b><span>New sell requests</span></div>
+        <div class="stat-card"><b id="s-swap">–</b><span>New swap requests</span></div>
+        <div class="stat-card"><b id="s-enq">–</b><span>Recent enquiries</span></div>
+        <div class="stat-card"><b id="s-users">–</b><span>Registered customers</span></div>
+      </div>
+
+      <div class="split" style="margin-top:34px;gap:26px;align-items:start">
+        <div class="card">
+          <h3 style="margin-bottom:14px">Most viewed products</h3>
+          <div id="top-viewed" class="muted small">Loading…</div>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom:14px">Most WhatsApp enquiries</h3>
+          <div id="top-clicked" class="muted small">Loading…</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------------- PRODUCTS ---------------- -->
+    <section class="admin-panel" id="p-products">
+      <div class="toolbar">
+        <div class="search">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 2a8 8 0 105.29 14.03l4.34 4.34a1 1 0 001.42-1.42l-4.34-4.34A8 8 0 0010 2zm0 2a6 6 0 110 12 6 6 0 010-12z"/></svg>
+          <label class="visually-hidden" for="adm-search">Search products</label>
+          <input id="adm-search" type="search" placeholder="Search product or brand…" autocomplete="off">
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <select id="adm-filter-cat" style="padding:9px 12px;border-radius:999px;border:1px solid var(--line-strong);font-size:.84rem">
+            <option value="all">All categories</option>
+            <option>iPhone</option><option>Samsung</option><option>Redmi</option>
+            <option>Laptops</option><option>Accessories</option>
+          </select>
+          <select id="adm-filter-status" style="padding:9px 12px;border-radius:999px;border:1px solid var(--line-strong);font-size:.84rem">
+            <option value="all">All statuses</option>
+            <option value="published">Published</option>
+            <option value="draft">Draft</option>
+            <option value="out_of_stock">Out of stock</option>
+            <option value="limited_stock">Limited stock</option>
+            <option value="coming_soon">Coming soon</option>
+          </select>
+          <button class="btn btn--dark btn--sm" id="btn-new-product">+ Add product</button>
+        </div>
+      </div>
+      <p class="small muted" style="margin-bottom:14px"><span id="prod-count">0</span> shown</p>
+      <div class="table-scroll card" style="padding:0;overflow:hidden">
+        <table class="adm-table">
+          <thead><tr>
+            <th>Product</th><th>Category</th><th>Price</th><th>Status</th><th>Flags</th><th style="text-align:right">Actions</th>
+          </tr></thead>
+          <tbody id="prod-tbody"><tr><td colspan="6" class="muted" style="padding:30px;text-align:center">Loading products…</td></tr></tbody>
+        </table>
+      </div>
+      <div style="text-align:center;margin-top:20px">
+        <button class="btn btn--light btn--sm" id="load-more-products" style="display:none">Load more</button>
+      </div>
+    </section>
+
+    <!-- ---------------- CATEGORIES ---------------- -->
+    <section class="admin-panel" id="p-categories">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+        <p class="lede" style="margin:0">Manage the shop categories shown on the homepage.</p>
+        <button class="btn btn--dark btn--sm" id="btn-new-category">+ Add category</button>
+      </div>
+      <div class="grid g-3" id="cat-grid"><p class="muted">Loading categories…</p></div>
+    </section>
+
+    <!-- ---------------- SELL REQUESTS ---------------- -->
+    <section class="admin-panel" id="p-sell">
+      <div class="table-scroll card" style="padding:0;overflow:hidden">
+        <table class="adm-table">
+          <thead><tr><th>Customer</th><th>Device</th><th>Condition</th><th>Date</th><th>Status</th><th style="text-align:right">Actions</th></tr></thead>
+          <tbody id="sell-tbody"><tr><td colspan="6" class="muted" style="padding:30px;text-align:center">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ---------------- SWAP REQUESTS ---------------- -->
+    <section class="admin-panel" id="p-swap">
+      <div class="table-scroll card" style="padding:0;overflow:hidden">
+        <table class="adm-table">
+          <thead><tr><th>Customer</th><th>Has</th><th>Wants</th><th>Date</th><th>Status</th><th style="text-align:right">Actions</th></tr></thead>
+          <tbody id="swap-tbody"><tr><td colspan="6" class="muted" style="padding:30px;text-align:center">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ---------------- ENQUIRIES ---------------- -->
+    <section class="admin-panel" id="p-enquiries">
+      <div class="table-scroll card" style="padding:0;overflow:hidden">
+        <table class="adm-table">
+          <thead><tr><th>Product</th><th>Customer</th><th>Type</th><th>Date</th><th>Status</th><th style="text-align:right">Actions</th></tr></thead>
+          <tbody id="enq-tbody"><tr><td colspan="6" class="muted" style="padding:30px;text-align:center">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ---------------- TESTIMONIALS ---------------- -->
+    <section class="admin-panel" id="p-testimonials">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+        <p class="lede" style="margin:0">Only <strong>approved</strong> testimonials appear publicly. Never publish invented reviews.</p>
+        <button class="btn btn--dark btn--sm" id="btn-new-testimonial">+ Add testimonial</button>
+      </div>
+      <div class="grid g-3" id="testi-grid"><p class="muted">Loading…</p></div>
+    </section>
+
+    <!-- ---------------- PROMOTIONS ---------------- -->
+    <section class="admin-panel" id="p-promotions">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+        <p class="lede" style="margin:0">Promotions display publicly only while active and inside their date range.</p>
+        <button class="btn btn--dark btn--sm" id="btn-new-promo">+ Add promotion</button>
+      </div>
+      <div class="grid g-3" id="promo-grid"><p class="muted">Loading…</p></div>
+    </section>
+
+    <!-- ---------------- SETTINGS ---------------- -->
+    <section class="admin-panel" id="p-settings">
+      <form class="form-card" id="settings-form" style="max-width:720px" novalidate>
+        <h3 style="margin-bottom:20px">Business information</h3>
+        <div class="form-grid">
+          <div class="field"><label for="set-name">Business name</label><input id="set-name" type="text"></div>
+          <div class="field"><label for="set-tag">Tagline</label><input id="set-tag" type="text"></div>
+          <div class="field"><label for="set-wa">WhatsApp number</label><input id="set-wa" type="tel" placeholder="+234 907 311 2162"></div>
+          <div class="field"><label for="set-email">Contact email</label><input id="set-email" type="email"></div>
+          <div class="field full"><label for="set-ann">Announcement bar text</label><input id="set-ann" type="text"></div>
+          <div class="field full"><label for="set-desc">Store description</label><textarea id="set-desc"></textarea></div>
+          <div class="field"><label for="set-ig">Instagram URL</label><input id="set-ig" type="url" placeholder="https://instagram.com/…"></div>
+          <div class="field"><label for="set-fb">Facebook URL</label><input id="set-fb" type="url" placeholder="https://facebook.com/…"></div>
+        </div>
+        <div class="btn-row"><button class="btn btn--dark" type="submit" id="save-settings-btn">Save settings</button></div>
+        <p class="form-status" id="settings-status"></p>
+      </form>
+    </section>
+
+  </main>
+</div>
+
+<!-- ===================== DRAWER ===================== -->
+<div class="drawer" id="drawer">
+  <div class="drawer-back" data-drawer-close></div>
+  <div class="drawer-body">
+    <div class="drawer-head">
+      <h2 id="drawer-title" style="font-size:1.5rem">Edit</h2>
+      <button class="icon-btn" data-drawer-close style="font-size:1rem;padding:6px 12px">&times; Close</button>
+    </div>
+    <div id="drawer-content"></div>
+  </div>
+</div>
+
+<!-- Firebase Compat SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+<script src="js/firebase-config.js"></script>
+<script src="js/firebase-auth.js"></script>
+<script src="js/firebase-db.js"></script>
+<script src="js/cloudinary-upload.js"></script>
+<script src="js/whatsapp.js"></script>
+<script src="js/products.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

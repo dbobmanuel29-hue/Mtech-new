@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="M-TECH Premium Gadget Store">
+  <rect width="64" height="64" rx="15" fill="#0b0b0c"/>
+  <path d="M14 45V19h6.6l11.4 16.2L43.4 19H50v26h-6.3V30.1L32.6 45.6h-1.2L20.3 30.1V45z" fill="#ffffff"/>
+  <circle cx="50.5" cy="43.5" r="3.5" fill="#1faa59"/>
+</svg>

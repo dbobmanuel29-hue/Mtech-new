@@ -1,0 +1,233 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ==========================================================================
+    // Core Helper Functions
+    // ==========================================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function getRole(userId) {
+      return get(/databases/$(database)/documents/users/$(userId)).data.role;
+    }
+
+    // Any authenticated user whose users/{uid}.role == "admin" is an admin.
+    // Supports multiple admins — no hard-coded emails or UIDs.
+    function isAdmin() {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        getRole(request.auth.uid) == 'admin';
+    }
+
+    // A guest or customer may only ever create an "admin" notification that
+    // matches this exact, tightly validated shape (used by sell/swap/enquiry
+    // flows). This prevents spam/spoofing while still allowing unauthenticated
+    // shoppers to trigger a legitimate admin alert.
+    function isValidGuestAdminNotification() {
+      let d = request.resource.data;
+      return d.recipientRole == 'admin'
+        && d.userId == 'admin'
+        && d.type in ['sell', 'swap', 'enquiry']
+        && d.title is string && d.title.size() > 0 && d.title.size() < 200
+        && d.message is string && d.message.size() > 0 && d.message.size() < 500
+        && d.link is string
+        && d.read == false
+        && d.createdAt == request.time
+        && d.keys().hasOnly(['type', 'title', 'message', 'link', 'read', 'recipientRole', 'userId', 'createdAt']);
+    }
+
+    // A customer may create a "customer" notification addressed to themself
+    // only (e.g. the welcome message on signup), stamped with their own uid.
+    function isValidSelfCustomerNotification() {
+      let d = request.resource.data;
+      return isAuthenticated()
+        && d.recipientRole == 'customer'
+        && d.userId == request.auth.uid
+        && d.createdBy == request.auth.uid
+        && d.type is string
+        && d.title is string && d.title.size() > 0 && d.title.size() < 200
+        && d.message is string && d.message.size() > 0 && d.message.size() < 500
+        && d.link is string
+        && d.read == false
+        && d.createdAt == request.time
+        && d.keys().hasOnly(['type', 'title', 'message', 'link', 'read', 'recipientRole', 'userId', 'createdAt', 'createdBy']);
+    }
+
+    // ==========================================================================
+    // Collections & Security Scopes
+    // ==========================================================================
+
+    // 1. Site Settings — public read, admin-only create/update.
+    // The frontend NEVER auto-creates this document from a visitor's browser;
+    // it only falls back to local defaults in memory if the doc is missing.
+    match /siteSettings/main {
+      allow read: true;
+      allow write: if isAdmin();
+    }
+
+    // 2. Users Collection
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+
+      // Self-registration must always create role == "customer".
+      // Admins may also create user documents (e.g. from the admin dashboard).
+      allow create: if (isOwner(userId) && request.resource.data.role == "customer") || isAdmin();
+
+      // A customer may only ever change: name, phone, photoURL, updatedAt.
+      // role / uid / email / createdAt can never be touched by the owning user.
+      // Only an existing admin can promote another account to role: "admin".
+      allow update: if isAdmin() || (
+        isOwner(userId) &&
+        !request.resource.data.diff(resource.data).affectedKeys()
+          .hasAny(['role', 'createdAt', 'uid', 'email'])
+      );
+
+      allow delete: if isAdmin();
+
+      // Wishlist Subcollection — fully private to the owning user.
+      match /wishlist/{productId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+
+    // 3. Products Collection — public read of published items only, admin-only writes.
+    match /products/{productId} {
+      allow read: if resource.data.status == 'published' || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // 4. Categories Collection — public read, admin-only writes.
+    match /categories/{categoryId} {
+      allow read: true;
+      allow write: if isAdmin();
+    }
+
+    // 5. Sell Requests Collection
+    match /sellRequests/{requestId} {
+      // Guests must submit userId == "guest"; authenticated users must submit
+      // their own uid. Nobody may impersonate another account on creation.
+      allow create: if
+        (!isAuthenticated() && request.resource.data.userId == "guest") ||
+        (isAuthenticated() && request.resource.data.userId == request.auth.uid);
+
+      // Only the submitting customer (by matching uid) or an admin may read it.
+      allow read: if isAdmin() || (
+        isAuthenticated() && resource.data.userId == request.auth.uid
+      );
+
+      // Customers can never modify a request after submission — status,
+      // adminNotes and estimatedOffer are admin-managed fields only.
+      allow update, delete: if isAdmin();
+    }
+
+    // 6. Swap Requests Collection — identical model to Sell Requests.
+    match /swapRequests/{requestId} {
+      allow create: if
+        (!isAuthenticated() && request.resource.data.userId == "guest") ||
+        (isAuthenticated() && request.resource.data.userId == request.auth.uid);
+
+      allow read: if isAdmin() || (
+        isAuthenticated() && resource.data.userId == request.auth.uid
+      );
+
+      allow update, delete: if isAdmin();
+    }
+
+    // 7. Enquiries Collection
+    // Guests and customers may log a WhatsApp click, but the document shape is
+    // strictly validated so arbitrary data cannot be written, and nobody may
+    // read, update or delete an enquiry except an admin.
+    match /enquiries/{enquiryId} {
+      allow create: if
+        request.resource.data.keys().hasOnly(
+          ['productId', 'productName', 'userId', 'userEmail', 'enquiryType', 'status', 'createdAt']
+        ) &&
+        request.resource.data.productId is string &&
+        request.resource.data.productId.size() > 0 &&
+        request.resource.data.productName is string &&
+        request.resource.data.userEmail is string &&
+        request.resource.data.enquiryType == "whatsapp_click" &&
+        request.resource.data.status == "new" &&
+        request.resource.data.createdAt == request.time &&
+        (
+          (!isAuthenticated() && request.resource.data.userId == "guest") ||
+          (isAuthenticated() && request.resource.data.userId == request.auth.uid)
+        );
+
+      allow read, update, delete: if isAdmin();
+    }
+
+    // 8. Testimonials Collection — public read of approved reviews only.
+    match /testimonials/{testimonialId} {
+      allow read: if resource.data.status == 'approved' || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // 9. Promotions Collection — public read of active promos only.
+    match /promotions/{promotionId} {
+      allow read: if resource.data.active == true || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // 10. Notifications Collection
+    // Two shapes are supported:
+    //   Admin notification:    recipientRole == "admin",    userId == "admin"
+    //   Customer notification: recipientRole == "customer", userId == <their uid>
+    match /notifications/{notificationId} {
+
+      // A customer may only read their own customer-targeted notifications.
+      // Admin notifications are never readable by non-admins.
+      allow read: if isAdmin() || (
+        isAuthenticated() &&
+        resource.data.recipientRole == 'customer' &&
+        resource.data.userId == request.auth.uid
+      );
+
+      // --- CREATE -------------------------------------------------------
+      // Admins can always create any notification.
+      //
+      // Everyone else (guests + customers) may ONLY create an "admin" alert
+      // generated by a legitimate storefront action (new sell/swap request or
+      // WhatsApp enquiry). The shape, enum values and server timestamp are
+      // strictly enforced so the endpoint cannot be abused to spam or spoof.
+      //
+      // A customer may create a "customer" notification addressed to
+      // themselves ONLY (used for the welcome message on signup), and must
+      // stamp createdBy with their own uid.
+      allow create: if isAdmin() || isValidGuestAdminNotification() || isValidSelfCustomerNotification();
+
+      // A customer may flip "read" on their own notification only.
+      // Admins may update anything (e.g. marking admin alerts as read).
+      allow update: if isAdmin() || (
+        isAuthenticated() &&
+        resource.data.recipientRole == 'customer' &&
+        resource.data.userId == request.auth.uid &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read'])
+      );
+
+      allow delete: if isAdmin();
+    }
+
+    // 11. Analytics Collection (anonymous product views & WhatsApp clicks)
+    // Anyone may create an event — this is intentionally anonymous — but the
+    // document shape and eventType enum are strictly validated. Nobody but an
+    // admin may ever read, update or delete analytics data.
+    match /analytics/{eventId} {
+      allow create: if
+        request.resource.data.eventType in ['product_view', 'whatsapp_click'] &&
+        request.resource.data.productId is string &&
+        request.resource.data.productId.size() > 0 &&
+        request.resource.data.createdAt == request.time &&
+        request.resource.data.keys().hasOnly(['eventType', 'productId', 'productName', 'userId', 'createdAt']);
+
+      allow read, update, delete: if isAdmin();
+    }
+  }
+}

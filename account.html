@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Account | M-TECH Premium Gadget Store, Port Harcourt</title>
+<meta name="description" content="Manage your M-TECH account — profile, saved gadgets, sell & swap request history.">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0b0b0c">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/responsive.css">
+<link rel="stylesheet" href="css/animations.css">
+<script>
+window.MTECH_IMG={
+  ok:function(i){var w=i.closest(".thumb")||i.parentElement;if(w)w.classList.add("is-loaded");},
+  fail:function(i){var w=i.closest(".thumb")||i.parentElement;i.style.display="none";if(w){w.classList.remove("is-loaded");w.classList.add("img-missing");}}
+};
+</script>
+<style>
+/* ─── Account tabs ─── */
+.acc-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px}
+.acc-tab{padding:10px 20px;border-radius:999px;border:1px solid var(--line-strong);background:#fff;
+  font-size:.88rem;font-weight:620;cursor:pointer;color:var(--ink-70);transition:all .2s ease;font-family:var(--font)}
+.acc-tab:hover{border-color:var(--ink);color:var(--ink)}
+.acc-tab.is-active{background:var(--ink);border-color:var(--ink);color:#fff}
+.acc-panel{display:none}
+.acc-panel.is-active{display:block;animation:mtechFadeUp .35s ease both}
+
+/* ─── Status pills ─── */
+.req-pill{display:inline-block;font-size:.65rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
+  padding:3px 9px;border-radius:999px}
+.req-pill.pending,.req-pill.new{background:#e7f0fd;color:#14459e}
+.req-pill.reviewing{background:#fff3e0;color:#8a4b00}
+.req-pill.offer_sent{background:#eef8f1;color:#166b3c}
+.req-pill.accepted{background:#eef8f1;color:#166b3c}
+.req-pill.completed{background:var(--ink);color:#fff}
+.req-pill.rejected{background:#fdecea;color:#95271f}
+
+/* ─── Avatar ─── */
+.avatar-circle{width:90px;height:90px;border-radius:50%;overflow:hidden;background:var(--off-2);
+  border:2px solid var(--line-strong);display:grid;place-items:center;flex:none}
+.avatar-circle img{width:100%;height:100%;object-fit:cover}
+.avatar-initial{font-size:2rem;font-weight:800;color:var(--ink)}
+
+/* ─── Wishlist card ─── */
+.saved-card-img{width:100%;aspect-ratio:1/1;background:#f7f7f4;display:grid;place-items:center;overflow:hidden}
+.saved-card-img img{width:100%;height:100%;object-fit:contain;padding:14px}
+
+/* ─── Request card ─── */
+.req-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius-sm);padding:18px;
+  display:flex;flex-direction:column;gap:8px}
+.req-card-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="marquee-strip"><div class="container">Port Harcourt, Rivers State &middot; Phones, laptops &amp; accessories &middot; <b>Buy &bull; Sell &bull; Swap</b> &middot; WhatsApp <b>+234 907 311 2162</b></div></div>
+
+<header class="site-header">
+  <div class="container">
+    <nav class="nav" aria-label="Primary">
+      <a class="brand" href="index.html" aria-label="M-TECH Premium Gadget Store home">
+        <span class="brand-mark" aria-hidden="true">M</span>
+        <span class="brand-text"><span class="brand-name">M-TECH</span><span class="brand-sub">Premium Gadgets</span></span>
+      </a>
+      <ul class="nav-list" role="menubar">
+        <li role="none"><a class="nav-link" href="index.html" role="menuitem">Home</a></li>
+        <li class="nav-has-sub" role="none">
+          <a class="nav-link nav-link--dropdown" role="menuitem" aria-haspopup="true" aria-expanded="false">Shop <span class="nav-caret" aria-hidden="true">&#9662;</span></a>
+          <ul class="nav-sub" role="menu">
+            <li role="none"><a class="nav-sub-link" href="iphone.html">iPhone</a></li>
+            <li role="none"><a class="nav-sub-link" href="samsung.html">Samsung</a></li>
+            <li role="none"><a class="nav-sub-link" href="redmi.html">Redmi</a></li>
+            <li role="none"><a class="nav-sub-link" href="laptops.html">Laptops</a></li>
+            <li role="none"><a class="nav-sub-link" href="accessories.html">Accessories</a></li>
+          </ul>
+        </li>
+        <li role="none"><a class="nav-link" href="buy-sell-swap.html">Buy &bull; Sell &bull; Swap</a></li>
+        <li class="nav-has-sub" role="none">
+          <a class="nav-link nav-link--dropdown" role="menuitem" aria-haspopup="true" aria-expanded="false">More <span class="nav-caret" aria-hidden="true">&#9662;</span></a>
+          <ul class="nav-sub" role="menu">
+            <li role="none"><a class="nav-sub-link" href="about.html">About</a></li>
+            <li role="none"><a class="nav-sub-link" href="contact.html">Contact</a></li>
+            <li role="none"><a class="nav-sub-link" href="terms.html">Terms &amp; Conditions</a></li>
+            <li role="none"><a class="nav-sub-link" href="privacy.html">Privacy Policy</a></li>
+          </ul>
+        </li>
+      </ul>
+      <div class="nav-actions">
+        <a class="btn btn--dark btn--sm" data-wa href="#">WhatsApp us</a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu"><span></span></button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<div class="mobile-panel" id="mobile-menu">
+  <div class="container" style="padding:0">
+    <a class="m-link" href="index.html">Home <span>&rarr;</span></a>
+    <p class="m-group-title">Categories</p>
+    <a class="m-link" href="iphone.html">iPhone <span>&rarr;</span></a>
+    <a class="m-link" href="samsung.html">Samsung <span>&rarr;</span></a>
+    <a class="m-link" href="redmi.html">Redmi <span>&rarr;</span></a>
+    <a class="m-link" href="laptops.html">Laptops <span>&rarr;</span></a>
+    <a class="m-link" href="accessories.html">Accessories <span>&rarr;</span></a>
+    <p class="m-group-title">Services</p>
+    <a class="m-link" href="buy-sell-swap.html">Buy &bull; Sell &bull; Swap <span>&rarr;</span></a>
+    <a class="m-link" href="about.html">About <span>&rarr;</span></a>
+    <a class="m-link" href="contact.html">Contact <span>&rarr;</span></a>
+    <div class="mobile-cta">
+      <a class="btn btn--wa btn--block" data-wa href="#">Chat with M-TECH on WhatsApp</a>
+    </div>
+  </div>
+</div>
+
+<main id="main">
+  <!-- Gate: shown while auth state loads -->
+  <section id="acc-loading" class="section" style="min-height:60vh;display:flex;align-items:center;justify-content:center">
+    <div style="text-align:center">
+      <p class="lede" style="color:var(--ink-55)">Loading your account…</p>
+    </div>
+  </section>
+
+  <!-- Actual dashboard (hidden until auth confirmed) -->
+  <div id="acc-shell" style="display:none">
+    <section class="page-hero" style="padding:36px 0">
+      <div class="container">
+        <div style="display:flex;flex-wrap:wrap;gap:18px;align-items:center;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap">
+            <div class="avatar-circle" id="acc-avatar-display">
+              <span class="avatar-initial" id="acc-initial">?</span>
+            </div>
+            <div>
+              <p class="crumbs" style="margin:0 0 4px"><a href="index.html">Home</a> &rsaquo; Account</p>
+              <h1 id="acc-welcome" style="font-size:1.9rem">Welcome back</h1>
+              <p class="small muted" id="acc-email-display"></p>
+            </div>
+          </div>
+          <div id="acc-admin-badge" style="display:none">
+            <a class="btn btn--dark btn--sm" href="admin.html">&#9881; Admin Dashboard</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top:26px">
+      <div class="container">
+        <div class="acc-tabs" id="acc-tabs">
+          <button class="acc-tab is-active" data-target="tab-profile">&#128100; Profile</button>
+          <button class="acc-tab" data-target="tab-saved" id="btn-saved-tab">&#9825; Saved Gadgets</button>
+          <button class="acc-tab" data-target="tab-viewed">&#128065; Recently Viewed</button>
+          <button class="acc-tab" data-target="tab-requests" id="btn-requests-tab">&#128203; My Requests</button>
+          <button class="acc-tab" data-target="tab-notifications">&#128276; Notifications</button>
+        </div>
+
+        <!-- ══════════ PROFILE ══════════ -->
+        <div class="acc-panel is-active" id="tab-profile">
+          <div class="split" style="grid-template-columns:1fr 1.6fr;gap:28px;align-items:start">
+
+            <!-- Left: avatar card -->
+            <div class="card" style="text-align:center;padding:28px">
+              <div class="avatar-circle" id="prof-avatar-big" style="width:110px;height:110px;margin:0 auto 14px;border:3px solid var(--line-strong);position:relative">
+                <img id="prof-avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover">
+                <span class="avatar-initial" id="prof-initial" style="font-size:2.5rem">?</span>
+                <!-- upload overlay -->
+                <div id="prof-uploading" style="position:absolute;inset:0;background:rgba(0,0,0,.6);border-radius:50%;display:none;align-items:center;justify-content:center;color:#fff;font-size:.7rem;font-weight:700">Uploading…</div>
+              </div>
+
+              <input type="file" id="prof-avatar-input" accept="image/jpeg,image/jpg,image/png,image/webp" style="display:none">
+              <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+                <button class="btn btn--light btn--sm" id="prof-change-photo">Upload Photo</button>
+                <button class="btn btn--ghost btn--sm" id="prof-remove-photo" style="display:none;border-color:#d98b84;color:#95271f">Remove</button>
+              </div>
+
+              <h3 id="prof-name-display" style="margin:18px 0 4px;font-size:1.2rem">—</h3>
+              <p class="tiny muted" id="prof-role-display" style="text-transform:uppercase;letter-spacing:.1em;font-weight:700">Customer</p>
+              <p class="small muted" id="prof-joined">Joined: —</p>
+
+              <hr style="margin:18px 0">
+              <button class="btn btn--light btn--sm btn--block js-logout" style="border-color:#d98b84;color:#95271f">Sign Out</button>
+            </div>
+
+            <!-- Right: edit form -->
+            <div class="form-card">
+              <h3 style="margin-bottom:20px">Account Settings</h3>
+              <form id="prof-form" novalidate>
+                <div class="form-grid">
+                  <div class="field full">
+                    <label for="pf-name">Full name <span aria-hidden="true">*</span></label>
+                    <input id="pf-name" name="name" type="text" required placeholder="Your full name">
+                  </div>
+                  <div class="field full">
+                    <label for="pf-email">Email address</label>
+                    <input id="pf-email" type="email" disabled style="opacity:.65;cursor:not-allowed;background:var(--off)">
+                    <span class="hint">Email cannot be changed here.</span>
+                  </div>
+                  <div class="field full">
+                    <label for="pf-phone">Phone / WhatsApp number</label>
+                    <input id="pf-phone" name="phone" type="tel" placeholder="+234 801 000 0000">
+                  </div>
+                </div>
+                <p class="form-status" id="prof-status"></p>
+                <div class="btn-row">
+                  <button class="btn btn--dark" type="submit" id="prof-save-btn">Save Changes</button>
+                </div>
+              </form>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ══════════ SAVED GADGETS ══════════ -->
+        <div class="acc-panel" id="tab-saved">
+          <div class="section-head" style="margin-bottom:20px">
+            <h2>Saved Gadgets</h2>
+            <p class="lede">Products you saved for later. Tap the heart on any product to add it here.</p>
+          </div>
+          <div id="saved-grid" class="product-grid" style="grid-template-columns:repeat(3,1fr)">
+            <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--ink-55)">Loading…</div>
+          </div>
+        </div>
+
+        <!-- ══════════ RECENTLY VIEWED ══════════ -->
+        <div class="acc-panel" id="tab-viewed">
+          <div class="section-head" style="margin-bottom:20px">
+            <h2>Recently Viewed</h2>
+            <p class="lede">Your last 10 products. Stored privately in this browser only — no account needed.</p>
+          </div>
+          <div id="recently-grid" class="grid g-3">
+            <p class="muted">No recently viewed products yet.</p>
+          </div>
+        </div>
+
+        <!-- ══════════ MY REQUESTS ══════════ -->
+        <div class="acc-panel" id="tab-requests">
+          <div class="grid g-2" style="align-items:start;gap:28px">
+
+            <!-- Sell requests -->
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+                <h3 style="font-size:1.2rem">My Sell Requests</h3>
+                <a class="btn btn--light btn--sm" href="buy-sell-swap.html#sell">+ New Request</a>
+              </div>
+              <div id="sell-req-list" style="display:flex;flex-direction:column;gap:12px">
+                <div class="req-card"><p class="small muted">Loading…</p></div>
+              </div>
+            </div>
+
+            <!-- Swap requests -->
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+                <h3 style="font-size:1.2rem">My Swap Requests</h3>
+                <a class="btn btn--light btn--sm" href="buy-sell-swap.html#swap">+ New Request</a>
+              </div>
+              <div id="swap-req-list" style="display:flex;flex-direction:column;gap:12px">
+                <div class="req-card"><p class="small muted">Loading…</p></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ══════════ NOTIFICATIONS ══════════ -->
+        <div class="acc-panel" id="tab-notifications">
+          <div class="section-head" style="margin-bottom:20px">
+            <h2>Notifications</h2>
+            <p class="lede">Status updates for your requests and account activity.</p>
+          </div>
+          <div id="notif-list-user" style="display:flex;flex-direction:column;gap:10px;max-width:680px">
+            <p class="muted">Loading notifications…</p>
+          </div>
+        </div>
+
+      </div><!-- .container -->
+    </section>
+  </div><!-- #acc-shell -->
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-about">
+        <a class="brand" href="index.html"><span class="brand-mark">M</span><span class="brand-text"><span class="brand-name" style="color:#fff">M-TECH</span><span class="brand-sub">Premium Gadgets</span></span></a>
+        <p>M-TECH Premium Gadget Store — phones, laptops and accessories in Port Harcourt, Rivers State, Nigeria.</p>
+        <a class="footer-wa" data-wa href="#">WhatsApp +234 907 311 2162</a>
+      </div>
+      <div class="footer-col"><h4>Shop</h4><ul>
+        <li><a href="iphone.html">iPhone</a></li><li><a href="samsung.html">Samsung</a></li>
+        <li><a href="redmi.html">Redmi</a></li><li><a href="laptops.html">Laptops</a></li>
+        <li><a href="accessories.html">Accessories</a></li>
+      </ul></div>
+      <div class="footer-col"><h4>Services</h4><ul>
+        <li><a href="buy-sell-swap.html">Buy a device</a></li>
+        <li><a href="buy-sell-swap.html#sell">Sell your phone</a></li>
+        <li><a href="buy-sell-swap.html#swap">Swap / trade-in</a></li>
+      </ul></div>
+      <div class="footer-col"><h4>Company</h4><ul>
+        <li><a href="about.html">About M-TECH</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="terms.html">Terms &amp; Conditions</a></li>
+        <li><a href="privacy.html">Privacy Policy</a></li>
+      </ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; <span data-year>2026</span> M-TECH Premium Gadget Store. Port Harcourt, Rivers State, Nigeria.</span>
+      <span><a href="terms.html">Terms</a> &middot; <a href="privacy.html">Privacy</a> &middot; <a href="contact.html">Contact</a></span>
+    </div>
+  </div>
+</footer>
+
+<a class="wa-float" data-wa href="#" aria-label="Chat with M-TECH on WhatsApp">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.47 14.38c-.3-.15-1.75-.86-2.02-.96-.27-.1-.47-.15-.67.15-.2.3-.77.96-.94 1.16-.17.2-.35.22-.65.07-.3-.15-1.25-.46-2.38-1.47-.88-.78-1.47-1.75-1.64-2.05-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.61-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.01-1.04 2.47s1.06 2.86 1.21 3.06c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.63.71.22 1.36.19 1.87.12.57-.09 1.75-.72 2-1.41.25-.69.25-1.28.17-1.41-.07-.13-.27-.2-.57-.35M12.05 21.5h-.02a9.4 9.4 0 0 1-4.79-1.31l-.34-.2-3.56.93.95-3.47-.22-.36a9.38 9.38 0 0 1-1.44-5.01c0-5.18 4.23-9.4 9.43-9.4a9.36 9.36 0 0 1 6.66 2.76 9.32 9.32 0 0 1 2.76 6.65c0 5.18-4.23 9.41-9.43 9.41M20.46 3.53A11.7 11.7 0 0 0 12.05 0C5.57 0 .3 5.26.3 11.72c0 2.07.54 4.08 1.57 5.86L.2 24l6.57-1.72a11.8 11.8 0 0 0 5.28 1.26h.01c6.48 0 11.75-5.26 11.75-11.72 0-3.13-1.22-6.07-3.44-8.29"/></svg>
+</a>
+<button class="to-top" type="button" aria-label="Back to top">&uarr;</button>
+
+<!-- Firebase Compat SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+<script src="js/firebase-config.js"></script>
+<script src="js/firebase-auth.js"></script>
+<script src="js/firebase-db.js"></script>
+<script src="js/cloudinary-upload.js"></script>
+<script src="js/whatsapp.js"></script>
+<script src="js/products.js"></script>
+<script src="js/navigation.js"></script>
+<script src="js/nav-account-btn.js"></script>
+<script src="js/forms.js"></script>
+<script src="js/main.js"></script>
+
+<script>
+/* ── Account Dashboard Controller ── */
+(function () {
+  "use strict";
+
+  var currentUser = null;
+
+  /* helpers */
+  function esc(s) {
+    return String(s == null ? "" : s)
+      .replace(/[&<>"']/g, function (c) {
+        return { "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c];
+      });
+  }
+  function fmtDate(ts) {
+    if (!ts) return "—";
+    var d = ts.toDate ? ts.toDate() : new Date();
+    return d.toLocaleDateString("en-GB", { day:"numeric", month:"short", year:"numeric" });
+  }
+  function pillClass(status) {
+    return "req-pill " + (status || "pending").replace(/\s+/g, "_").toLowerCase();
+  }
+  function waLink(phone, msg) {
+    var digits = String(phone||"").replace(/[^0-9]/g,"");
+    if (digits.startsWith("0")) digits = "234" + digits.slice(1);
+    return "https://wa.me/" + digits + "?text=" + encodeURIComponent(msg);
+  }
+  function showToast(msg, isError) {
+    var el = document.createElement("div");
+    el.textContent = msg;
+    el.style.cssText = "position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:1200;" +
+      "background:" + (isError ? "#95271f" : "var(--ink)") + ";color:#fff;padding:12px 22px;" +
+      "border-radius:999px;font-size:.85rem;font-weight:600;box-shadow:var(--shadow-lg);max-width:90vw;text-align:center";
+    document.body.appendChild(el);
+    setTimeout(function () { el.remove(); }, 2600);
+  }
+
+  /* ── Tab switching ── */
+  document.querySelectorAll(".acc-tab").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      document.querySelectorAll(".acc-tab").forEach(function (b) { b.classList.remove("is-active"); });
+      document.querySelectorAll(".acc-panel").forEach(function (p) { p.classList.remove("is-active"); });
+      btn.classList.add("is-active");
+      var target = document.getElementById(btn.getAttribute("data-target"));
+      if (target) target.classList.add("is-active");
+    });
+  });
+
+  /* Handle URL hash tab switching */
+  function openTabFromHash() {
+    var hash = window.location.hash;
+    var map = { "#saved": "btn-saved-tab", "#requests": "btn-requests-tab" };
+    if (map[hash]) {
+      var t = document.getElementById(map[hash]);
+      if (t) t.click();
+    }
+  }
+  window.addEventListener("hashchange", openTabFromHash);
+
+  /* ── Auth gate ── */
+  function onAuthReady(user) {
+    document.getElementById("acc-loading").style.display = "none";
+
+    if (!user) {
+      window.location.href = "login.html";
+      return;
+    }
+
+    currentUser = user;
+    document.getElementById("acc-shell").style.display = "block";
+
+    renderHeader(user);
+    renderProfilePanel(user);
+    loadSavedGadgets(user.uid);
+    loadRecentlyViewed();
+    loadMyRequests(user.uid);
+    loadUserNotifications(user.uid);
+    openTabFromHash();
+
+    if (user.role === "admin") {
+      document.getElementById("acc-admin-badge").style.display = "block";
+    }
+  }
+
+  if (window.MTECH_AUTH) {
+    MTECH_AUTH.onAuthStateChanged(onAuthReady);
+  } else {
+    // No Firebase — redirect to login
+    window.location.href = "login.html";
+  }
+
+  /* ── Header ── */
+  function renderHeader(user) {
+    var name = user.name || user.displayName || user.email || "Customer";
+    document.getElementById("acc-welcome").textContent = "Welcome back, " + name.split(" ")[0];
+    document.getElementById("acc-email-display").textContent = user.email;
+
+    var initEl = document.getElementById("acc-initial");
+    if (initEl) initEl.textContent = name[0].toUpperCase();
+
+    var avatarEl = document.getElementById("acc-avatar-display");
+    if (avatarEl && user.photoURL) {
+      avatarEl.innerHTML = '<img src="' + esc(user.photoURL) + '" alt="Profile photo" style="width:100%;height:100%;object-fit:cover">';
+    }
+  }
+
+  /* ── Profile Panel ── */
+  function renderProfilePanel(user) {
+    var name = user.name || user.displayName || "";
+    document.getElementById("pf-name").value = name;
+    document.getElementById("pf-email").value = user.email || "";
+    document.getElementById("pf-phone").value = user.phone || "";
+    document.getElementById("prof-name-display").textContent = name || "—";
+    document.getElementById("prof-role-display").textContent = (user.role || "customer").toUpperCase();
+
+    if (user.createdAt) {
+      document.getElementById("prof-joined").textContent = "Member since " + fmtDate(user.createdAt);
+    }
+
+    // Avatar
+    var img = document.getElementById("prof-avatar-img");
+    var initial = document.getElementById("prof-initial");
+    if (user.photoURL) {
+      img.src = user.photoURL;
+      img.style.display = "block";
+      initial.style.display = "none";
+      document.getElementById("prof-remove-photo").style.display = "inline-flex";
+    } else {
+      img.style.display = "none";
+      initial.style.display = "block";
+      initial.textContent = (name || user.email || "?")[0].toUpperCase();
+      document.getElementById("prof-remove-photo").style.display = "none";
+    }
+  }
+
+  /* ── Profile Form ── */
+  document.getElementById("prof-form").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    var btn = document.getElementById("prof-save-btn");
+    var status = document.getElementById("prof-status");
+    btn.disabled = true;
+    status.className = "form-status is-visible";
+    status.textContent = "Saving…";
+
+    try {
+      var name = document.getElementById("pf-name").value.trim();
+      var phone = document.getElementById("pf-phone").value.trim();
+
+      if (!name) throw new Error("Full name is required.");
+
+      if (MTECH_CONFIG.isEnabled) {
+        await MTECH_CONFIG.db.collection("users").doc(currentUser.uid).update({
+          name: name,
+          phone: phone,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        await MTECH_CONFIG.auth.currentUser.updateProfile({ displayName: name });
+      }
+
+      currentUser.name = name;
+      currentUser.phone = phone;
+      renderHeader(currentUser);
+      renderProfilePanel(currentUser);
+
+      btn.disabled = false;
+      status.className = "form-status is-visible";
+      status.style.cssText = "background:#eef8f1;border-color:#cbe8d6;color:#166b3c";
+      status.textContent = "Profile saved successfully!";
+    } catch (err) {
+      btn.disabled = false;
+      status.className = "form-status is-visible is-error";
+      status.textContent = "Could not save changes. Please try again.";
+    }
+  });
+
+  /* ── Avatar Upload ── */
+  document.getElementById("prof-change-photo").addEventListener("click", function () {
+    document.getElementById("prof-avatar-input").click();
+  });
+
+  document.getElementById("prof-avatar-input").addEventListener("change", async function (e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    var uploading = document.getElementById("prof-uploading");
+    uploading.style.display = "flex";
+
+    try {
+      if (!window.MTECH_CLOUDINARY) throw new Error("Cloudinary service unavailable.");
+      var result = await MTECH_CLOUDINARY.uploadFile(file, "m-tech/profiles");
+      var photoURL = result.url;
+
+      if (MTECH_CONFIG.isEnabled) {
+        await MTECH_CONFIG.db.collection("users").doc(currentUser.uid).update({ photoURL: photoURL });
+        await MTECH_CONFIG.auth.currentUser.updateProfile({ photoURL: photoURL });
+      }
+
+      currentUser.photoURL = photoURL;
+      uploading.style.display = "none";
+      renderHeader(currentUser);
+      renderProfilePanel(currentUser);
+      showToast("Profile photo updated!");
+    } catch (err) {
+      uploading.style.display = "none";
+      showToast(err.message || "Upload failed. Please try again.", true);
+    }
+  });
+
+  document.getElementById("prof-remove-photo").addEventListener("click", async function () {
+    if (!confirm("Remove your profile photo?")) return;
+    try {
+      if (MTECH_CONFIG.isEnabled) {
+        await MTECH_CONFIG.db.collection("users").doc(currentUser.uid).update({ photoURL: "" });
+        await MTECH_CONFIG.auth.currentUser.updateProfile({ photoURL: null });
+      }
+      currentUser.photoURL = "";
+      renderHeader(currentUser);
+      renderProfilePanel(currentUser);
+      showToast("Profile photo removed.");
+    } catch (err) {
+      showToast("Could not remove photo. Please try again.", true);
+    }
+  });
+
+  /* ── Logout ── */
+  document.querySelectorAll(".js-logout").forEach(function (btn) {
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
+      if (window.MTECH_AUTH) MTECH_AUTH.logOut().then(function () { window.location.href = "index.html"; });
+    });
+  });
+
+  /* ── Saved Gadgets ── */
+  async function loadSavedGadgets(uid) {
+    var grid = document.getElementById("saved-grid");
+    if (!grid) return;
+
+    if (!MTECH_CONFIG.isEnabled) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px" class="empty-state"><h3>Saved Gadgets</h3><p style="color:var(--ink-55);margin:10px 0 20px">Firebase is not configured yet — saved gadgets will appear here once connected.</p><a class="btn btn--dark btn--sm" href="index.html#shop">Browse products</a></div>';
+      return;
+    }
+
+    try {
+      var items = await MTECH_DB.getWishlist(uid);
+
+      if (!items.length) {
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:52px 20px" class="empty-state">' +
+          '<h3 style="font-size:1.5rem;margin-bottom:10px">No Saved Gadgets Yet</h3>' +
+          '<p style="color:var(--ink-55);margin-bottom:22px">Explore our catalog and tap &#9825; on any product to save it here.</p>' +
+          '<a class="btn btn--dark btn--sm" href="index.html#shop">Shop Gadgets</a></div>';
+        return;
+      }
+
+      grid.innerHTML = items.map(function (p) {
+        var src = p.thumbnail || p.image || "";
+        return '<article class="product-card">' +
+          '<div class="saved-card-img">' +
+            (src ? '<img src="' + esc(src) + '" alt="' + esc(p.name) + '" loading="lazy" decoding="async">' : '<span class="muted tiny">No image</span>') +
+          '</div>' +
+          '<div class="product-body">' +
+            '<span class="p-brand">' + esc(p.brand) + '</span>' +
+            '<h3 class="p-name">' + esc(p.name) + '</h3>' +
+            '<p class="p-avail"><span class="dot"></span>' + esc(p.availability || "Check availability") + '</p>' +
+            '<div class="p-actions">' +
+              '<button class="btn btn--light btn--sm js-view" data-id="' + esc(p.id) + '">View details</button>' +
+              '<button class="btn btn--ghost btn--sm" style="border-color:#d98b84;color:#95271f" data-unsave="' + esc(p.id) + '">Remove</button>' +
+            '</div>' +
+          '</div>' +
+        '</article>';
+      }).join("");
+
+      // Unsave handler
+      grid.querySelectorAll("[data-unsave]").forEach(function (btn) {
+        btn.addEventListener("click", async function () {
+          var id = btn.getAttribute("data-unsave");
+          try {
+            await MTECH_DB.toggleWishlist(uid, id);
+            showToast("Removed from saved gadgets.");
+            loadSavedGadgets(uid);
+          } catch (err) {
+            showToast("Could not remove item. Please try again.", true);
+          }
+        });
+      });
+    } catch (err) {
+      grid.innerHTML = '<div style="grid-column:1/-1;padding:30px;text-align:center;color:#95271f">Could not load saved gadgets. Please refresh.</div>';
+    }
+  }
+
+  /* ── Recently Viewed ── */
+  function loadRecentlyViewed() {
+    var container = document.getElementById("recently-grid");
+    if (!container) return;
+
+    var list = [];
+    try { list = JSON.parse(localStorage.getItem("mtech_recently_viewed") || "[]"); } catch (e) {}
+
+    if (!list.length) {
+      container.innerHTML = '<p class="muted">You have not viewed any products yet. <a href="index.html#shop" style="text-decoration:underline">Browse the store</a> to get started.</p>';
+      return;
+    }
+
+    container.innerHTML = list.slice(0, 9).map(function (item) {
+      return '<div class="card" style="display:flex;gap:14px;align-items:center;padding:14px">' +
+        '<div style="width:60px;height:60px;flex:none;border-radius:10px;overflow:hidden;background:var(--off);display:grid;place-items:center">' +
+          '<img src="' + esc(item.image || "") + '" alt="' + esc(item.name) + '" style="width:100%;height:100%;object-fit:contain;padding:6px" loading="lazy">' +
+        '</div>' +
+        '<div style="min-width:0">' +
+          '<span class="p-brand">' + esc(item.brand || "") + '</span>' +
+          '<p style="font-weight:700;font-size:.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(item.name) + '</p>' +
+          '<button class="btn btn--light btn--sm js-view" data-id="' + esc(item.id) + '" style="margin-top:8px;font-size:.75rem;padding:5px 10px">View again</button>' +
+        '</div>' +
+      '</div>';
+    }).join("");
+  }
+
+  /* ── My Requests ── */
+  async function loadMyRequests(uid) {
+    if (!MTECH_CONFIG.isEnabled) {
+      ["sell-req-list", "swap-req-list"].forEach(function (id) {
+        document.getElementById(id).innerHTML = '<div class="req-card"><p class="small muted">Firebase is not configured yet — your requests will appear here once connected.</p></div>';
+      });
+      return;
+    }
+
+    // Sell
+    try {
+      var sellSnap = await MTECH_CONFIG.db.collection("sellRequests")
+        .where("userId", "==", uid).orderBy("createdAt", "desc").limit(20).get();
+      var sellEl = document.getElementById("sell-req-list");
+
+      if (sellSnap.empty) {
+        sellEl.innerHTML = '<div class="req-card" style="border-style:dashed;text-align:center">' +
+          '<p class="small muted" style="margin-bottom:14px">No sell requests yet. Ready to get cash for your device?</p>' +
+          '<a class="btn btn--light btn--sm" href="buy-sell-swap.html">Sell My Device</a></div>';
+      } else {
+        var sellHTML = "";
+        sellSnap.forEach(function (doc) {
+          var r = doc.data();
+          sellHTML += '<div class="req-card">' +
+            '<div class="req-card-meta">' +
+              '<span class="' + pillClass(r.status) + '">' + esc(r.status || "pending") + '</span>' +
+              '<span class="tiny muted">' + fmtDate(r.createdAt) + '</span>' +
+            '</div>' +
+            '<h4 style="font-size:1rem;font-family:var(--font);font-weight:700">' + esc(r.deviceBrand || "") + ' ' + esc(r.deviceModel || r.device || "") + '</h4>' +
+            '<p class="small muted">Storage: ' + esc(r.storage || "—") + ' &middot; Condition: ' + esc((r.condition || "").split("—")[0].trim()) + '</p>' +
+            (r.estimatedOffer ? '<div style="margin-top:10px;background:var(--off);padding:8px 12px;border-radius:var(--radius-xs)"><span class="tiny muted" style="display:block;text-transform:uppercase">M-TECH Estimated Offer</span><strong style="font-size:1.1rem;color:var(--wa)">&#8358; ' + Number(r.estimatedOffer).toLocaleString() + '</strong></div>' : '') +
+            (r.adminNotes ? '<div style="margin-top:10px;border-top:1px dashed var(--line);padding-top:8px"><span class="tiny muted">Note from M-TECH: </span><span class="small">' + esc(r.adminNotes) + '</span></div>' : '') +
+          '</div>';
+        });
+        sellEl.innerHTML = sellHTML;
+      }
+    } catch (err) {
+      document.getElementById("sell-req-list").innerHTML = '<div class="req-card"><p class="small" style="color:#95271f">Could not load sell requests. Please refresh.</p></div>';
+    }
+
+    // Swap
+    try {
+      var swapSnap = await MTECH_CONFIG.db.collection("swapRequests")
+        .where("userId", "==", uid).orderBy("createdAt", "desc").limit(20).get();
+      var swapEl = document.getElementById("swap-req-list");
+
+      if (swapSnap.empty) {
+        swapEl.innerHTML = '<div class="req-card" style="border-style:dashed;text-align:center">' +
+          '<p class="small muted" style="margin-bottom:14px">No swap requests yet. Want to trade in your device?</p>' +
+          '<a class="btn btn--light btn--sm" href="buy-sell-swap.html">Swap My Device</a></div>';
+      } else {
+        var swapHTML = "";
+        swapSnap.forEach(function (doc) {
+          var r = doc.data();
+          swapHTML += '<div class="req-card">' +
+            '<div class="req-card-meta">' +
+              '<span class="' + pillClass(r.status) + '">' + esc(r.status || "pending") + '</span>' +
+              '<span class="tiny muted">' + fmtDate(r.createdAt) + '</span>' +
+            '</div>' +
+            '<h4 style="font-size:1rem;font-family:var(--font);font-weight:700">Swap: ' + esc(r.currentDevice || "—") + '</h4>' +
+            '<p class="small muted">Wants: ' + esc(r.desiredProductName || "—") + '</p>' +
+            (r.estimatedTopUp ? '<div style="margin-top:10px;background:var(--off);padding:8px 12px;border-radius:var(--radius-xs)"><span class="tiny muted" style="display:block;text-transform:uppercase">Estimated Top-up</span><strong style="font-size:1.1rem">&#8358; ' + Number(r.estimatedTopUp).toLocaleString() + '</strong></div>' : '') +
+            (r.adminNotes ? '<div style="margin-top:10px;border-top:1px dashed var(--line);padding-top:8px"><span class="tiny muted">Note from M-TECH: </span><span class="small">' + esc(r.adminNotes) + '</span></div>' : '') +
+          '</div>';
+        });
+        swapEl.innerHTML = swapHTML;
+      }
+    } catch (err) {
+      document.getElementById("swap-req-list").innerHTML = '<div class="req-card"><p class="small" style="color:#95271f">Could not load swap requests. Please refresh.</p></div>';
+    }
+  }
+
+  /* ── Notifications ── */
+  async function loadUserNotifications(uid) {
+    var el = document.getElementById("notif-list-user");
+    if (!MTECH_CONFIG.isEnabled) {
+      el.innerHTML = '<p class="muted">Notifications require Firebase connection.</p>';
+      return;
+    }
+    try {
+      /* Both filters are required to satisfy firestore.rules, which validates
+         recipientRole == "customer" AND userId == request.auth.uid together.
+         Firestore rejects "list" queries whose where-clauses don't cover every
+         resource.data field referenced by the rule, so both must be present. */
+      var snap = await MTECH_CONFIG.db.collection("notifications")
+        .where("userId", "==", uid)
+        .where("recipientRole", "==", "customer")
+        .orderBy("createdAt", "desc").limit(25).get();
+
+      if (snap.empty) {
+        el.innerHTML = '<div class="card" style="border-style:dashed;text-align:center;padding:30px"><p class="muted">No notifications yet. Request status updates will appear here.</p></div>';
+        return;
+      }
+
+      var html = "";
+      snap.forEach(function (doc) {
+        var n = doc.data();
+        html += '<div class="card" style="padding:16px;border-radius:var(--radius-sm)">' +
+          '<div style="display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap">' +
+            '<b style="font-size:.92rem">' + esc(n.title || "Notification") + '</b>' +
+            '<span class="tiny muted">' + fmtDate(n.createdAt) + '</span>' +
+          '</div>' +
+          '<p class="small muted" style="margin-top:6px">' + esc(n.message || "") + '</p>' +
+        '</div>';
+      });
+      el.innerHTML = html;
+    } catch (err) {
+      el.innerHTML = '<p class="muted small" style="color:#95271f">Could not load notifications.</p>';
+    }
+  }
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+# robots.txt — M-TECH Premium Gadget Store
+# Port Harcourt, Rivers State, Nigeria
+
+User-agent: *
+Allow: /
+
+# No admin areas, no private paths — this is a static marketing site.
+
+Sitemap: https://mtechpremiumgadgets.vercel.app/sitemap.xml

@@ -1,0 +1,63 @@
+/* ==========================================================================
+   M-TECH Premium Gadget Store — Animations (subtle, premium, GPU friendly)
+   ========================================================================== */
+
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .7s cubic-bezier(.16,.8,.3,1),transform .7s cubic-bezier(.16,.8,.3,1)}
+.reveal.is-in{opacity:1;transform:none}
+.reveal[data-delay="1"]{transition-delay:.07s}
+.reveal[data-delay="2"]{transition-delay:.14s}
+.reveal[data-delay="3"]{transition-delay:.21s}
+.reveal[data-delay="4"]{transition-delay:.28s}
+.reveal[data-delay="5"]{transition-delay:.35s}
+
+@keyframes mtechFadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes mtechFade{from{opacity:0}to{opacity:1}}
+@keyframes mtechScaleIn{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
+@keyframes mtechPulse{0%,100%{box-shadow:0 0 0 0 rgba(31,170,89,.42)}70%{box-shadow:0 0 0 16px rgba(31,170,89,0)}}
+@keyframes mtechShimmer{0%{background-position:-420px 0}100%{background-position:420px 0}}
+
+.hero .hero-badge{animation:mtechFadeUp .6s .05s both}
+.hero h1{animation:mtechFadeUp .7s .12s both}
+.hero .lede{animation:mtechFadeUp .7s .2s both}
+.hero .btn-row{animation:mtechFadeUp .7s .28s both}
+.hero .hero-stats{animation:mtechFadeUp .7s .36s both}
+.hero-media{animation:mtechScaleIn .9s .1s both}
+.hero-chip{animation:mtechFadeUp .7s .5s both}
+.page-hero .crumbs,.page-hero h1,.page-hero .lede,.page-hero .btn-row{animation:mtechFadeUp .6s both}
+.page-hero h1{animation-delay:.06s}
+.page-hero .lede{animation-delay:.12s}
+.page-hero .btn-row{animation-delay:.18s}
+
+.wa-float{animation:mtechPulse 3.4s 1.6s infinite}
+.modal.is-open .modal-card{animation:mtechScaleIn .3s ease both}
+.modal.is-open .modal-backdrop{animation:mtechFade .3s ease both}
+.mobile-panel .m-link{animation:mtechFadeUp .38s both}
+.mobile-panel.is-open .m-link:nth-child(1){animation-delay:.03s}
+.mobile-panel.is-open .m-link:nth-child(2){animation-delay:.06s}
+.mobile-panel.is-open .m-link:nth-child(3){animation-delay:.09s}
+.mobile-panel.is-open .m-link:nth-child(4){animation-delay:.12s}
+.mobile-panel.is-open .m-link:nth-child(5){animation-delay:.15s}
+.mobile-panel.is-open .m-link:nth-child(6){animation-delay:.18s}
+
+/* image loading shimmer while the photo decodes */
+.thumb::before{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(90deg,#f2f2ee 0%,#e9e9e3 45%,#f2f2ee 90%);
+  background-size:420px 100%;animation:mtechShimmer 1.35s linear infinite;opacity:1;
+  transition:opacity .4s ease;pointer-events:none
+}
+.thumb.is-loaded::before,.thumb.img-missing::before{opacity:0;animation:none}
+.thumb img{opacity:0;transition:opacity .45s ease,transform .6s cubic-bezier(.2,.7,.3,1)}
+.thumb.is-loaded img{opacity:1}
+
+.btn,.card,.product-card,.cat-card,.chip{will-change:transform}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.001ms !important;animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;scroll-behavior:auto !important
+  }
+  .reveal{opacity:1;transform:none}
+  .thumb img{opacity:1}
+  .thumb::before{display:none}
+}
