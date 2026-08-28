@@ -1,0 +1,8 @@
+{
+  "name": "m-tech-premium-gadget-store",
+  "version": "2.0.0",
+  "private": true,
+  "description": "M-TECH Premium Gadget Store — static vanilla HTML/CSS/JS storefront with Firebase Auth/Firestore and a minimal Vercel serverless admin API.",
+  "engines": { "node": ">=18" },
+  "dependencies": { "firebase-admin": "^12.7.0" }
+}

@@ -1,6 +1,18 @@
 {
-  "rewrites": [
-    { "source": "/css/:path*", "destination": "/:path*" },
-    { "source": "/js/:path*", "destination": "/:path*" }
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "@vercel/node@3.2.29",
+      "memory": 512,
+      "maxDuration": 30
+    }
+  },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, max-age=0" }
+      ]
+    }
   ]
 }
