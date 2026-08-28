@@ -138,7 +138,15 @@ document.addEventListener("DOMContentLoaded", function () {
   initNavigation();
   initProductModal();
   initFAQ();
-  initForms();
+
+  /* Forms are a page-level dependency. Product/account/login pages can load
+     main.js without loading forms.js, so never crash the rest of the page
+     boot when the optional form module is intentionally absent. On pages that
+     include forms.js, initForms remains the original initializer and all form
+     behaviour is preserved. */
+  if (typeof initForms === "function") {
+    initForms();
+  }
 
   /* categories grid (homepage) */
   if (document.querySelector("[data-categories]")) renderCategories("[data-categories]");
