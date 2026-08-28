@@ -7,6 +7,8 @@ function mtechAuthTrace(label, details) {
   else console.info("[M-TECH AUTH TRACE] " + label, details);
 }
 
+console.info("[M-TECH GOOGLE DEBUG] AUTH MODULE LOADED", { build: "google-trace-2026-08-28-01", url: window.location.href });
+
 function mtechSafeAuthState(auth) {
   var user = auth && auth.currentUser;
   return {
@@ -97,7 +99,15 @@ const MTECH_AUTH = {
       mtechAuthTrace("BEFORE signInWithPopup", { providerId: provider.providerId, authState: mtechSafeAuthState(authInstance), url: window.location.href });
       let userCredential;
       try {
-        userCredential = await authInstance.signInWithPopup(provider);
+        var popupSettled = false;
+        var popupPromise = authInstance.signInWithPopup(provider);
+        popupPromise.then(function () { popupSettled = true; }, function () { popupSettled = true; });
+        setTimeout(function () {
+          if (!popupSettled) {
+            mtechAuthTrace("signInWithPopup STILL PENDING", { elapsedMs: 10000, authState: mtechSafeAuthState(authInstance), providerId: provider.providerId, url: window.location.href, storage: mtechStorageDiagnostics() });
+          }
+        }, 10000);
+        userCredential = await popupPromise;
         mtechAuthTrace("signInWithPopup RESOLVED", { hasCredential: !!userCredential, hasUser: !!(userCredential && userCredential.user), authState: mtechSafeAuthState(authInstance), providerId: provider.providerId, url: window.location.href });
       } catch (error) {
         mtechAuthTrace("signInWithPopup REJECTED", { code: error && error.code ? error.code : "unknown", message: error && error.message ? error.message : "unknown", name: error && error.name ? error.name : "unknown", providerId: provider.providerId, authStateBeforeAfter: mtechSafeAuthState(authInstance), url: window.location.href });
