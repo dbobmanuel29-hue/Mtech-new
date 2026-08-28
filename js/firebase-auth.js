@@ -9,6 +9,31 @@ function mtechAuthTrace(label, details) {
 
 console.info("[M-TECH GOOGLE DEBUG] AUTH MODULE LOADED", { build: "google-trace-2026-08-28-01", url: window.location.href });
 
+/* Capture-phase diagnostic: this runs before normal bubbling handlers and never
+   invokes authentication. It proves whether the browser's click reaches the
+   actual #google-btn element at all. */
+document.addEventListener("click", function (event) {
+  var target = event && event.target;
+  var button = target && typeof target.closest === "function" ? target.closest("#google-btn") : null;
+  if (!button) return;
+  console.info("[M-TECH GOOGLE EVENT] CAPTURE CLICK DETECTED", {
+    targetTag: target && target.tagName ? target.tagName : null,
+    targetId: target && target.id ? target.id : null,
+    buttonId: button.id,
+    buttonDisabled: !!button.disabled,
+    defaultPrevented: !!event.defaultPrevented,
+    currentUrl: window.location.href
+  });
+  setTimeout(function () {
+    console.info("[M-TECH GOOGLE EVENT] AFTER CAPTURE CLICK", {
+      buttonStillInDom: document.getElementById("google-btn") === button,
+      defaultPrevented: !!event.defaultPrevented,
+      currentUser: MTECH_CONFIG && MTECH_CONFIG.auth && MTECH_CONFIG.auth.currentUser ? MTECH_CONFIG.auth.currentUser.uid : null,
+      currentUrl: window.location.href
+    });
+  }, 0);
+}, true);
+
 function mtechSafeAuthState(auth) {
   var user = auth && auth.currentUser;
   return {
