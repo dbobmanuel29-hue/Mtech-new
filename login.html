@@ -36,68 +36,32 @@ window.MTECH_IMG={
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
-
 <div class="auth-page" id="main" role="main">
   <div class="auth-visual">
     <img src="https://images.pexels.com/photos/28919443/pexels-photo-28919443.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=1200&w=800" alt="M-TECH gadget store" loading="lazy">
     <div class="auth-visual-content">
-      <a class="brand" href="index.html" style="margin-bottom:32px">
-        <span class="brand-mark" style="background:#fff;color:var(--ink)">M</span>
-        <span class="brand-text"><span class="brand-name" style="color:#fff">M-TECH</span><span class="brand-sub" style="color:rgba(255,255,255,.55)">Premium Gadgets</span></span>
-      </a>
+      <a class="brand" href="index.html" style="margin-bottom:32px"><span class="brand-mark" style="background:#fff;color:var(--ink)">M</span><span class="brand-text"><span class="brand-name" style="color:#fff">M-TECH</span><span class="brand-sub" style="color:rgba(255,255,255,.55)">Premium Gadgets</span></span></a>
       <h2>The smartest way to get premium tech in Port Harcourt.</h2>
       <p>iPhones, Samsung, Redmi, laptops and accessories — plus buying, selling and swapping. Honest prices, genuine devices.</p>
     </div>
   </div>
-
   <div class="auth-form-side">
     <div class="auth-box">
-      <div style="margin-bottom:28px">
-        <a class="brand" href="index.html" style="display:flex;gap:10px;align-items:center;margin-bottom:20px;text-decoration:none">
-          <span class="brand-mark" style="width:32px;height:32px;font-size:.8rem">M</span>
-          <span class="brand-name">M-TECH</span>
-        </a>
-        <h1 style="font-size:1.9rem;margin-bottom:6px">Welcome back</h1>
-        <p class="small muted">Log in to your account to continue.</p>
-      </div>
-
+      <div style="margin-bottom:28px"><a class="brand" href="index.html" style="display:flex;gap:10px;align-items:center;margin-bottom:20px;text-decoration:none"><span class="brand-mark" style="width:32px;height:32px;font-size:.8rem">M</span><span class="brand-name">M-TECH</span></a><h1 style="font-size:1.9rem;margin-bottom:6px">Welcome back</h1><p class="small muted">Log in to your account to continue.</p></div>
       <div id="form-error" style="display:none;background:#fdecea;border:1px solid #f2d4d4;border-radius:var(--radius-xs);padding:12px 16px;font-size:.88rem;color:#95271f;margin-bottom:18px"></div>
-
       <form id="login-form" novalidate>
-        <div class="field" style="margin-bottom:16px">
-          <label for="l-email">Email address</label>
-          <input id="l-email" type="email" name="email" required placeholder="you@example.com" autocomplete="email">
-        </div>
-        <div class="field" style="margin-bottom:6px">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-            <label for="l-password" style="margin:0">Password</label>
-            <a href="forgot-password.html" class="tiny" style="color:var(--ink-55);text-decoration:underline">Forgot password?</a>
-          </div>
-          <div style="position:relative;display:flex;align-items:center">
-            <input id="l-password" type="password" name="password" required placeholder="••••••••" autocomplete="current-password" style="padding-right:52px;width:100%">
-            <button type="button" id="pw-toggle" tabindex="-1" style="position:absolute;right:14px;background:none;border:none;cursor:pointer;color:var(--grey);font-size:.74rem;font-weight:700">SHOW</button>
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;margin-top:10px">
-          <input type="checkbox" id="l-remember" checked style="width:auto;cursor:pointer">
-          <label for="l-remember" class="small" style="cursor:pointer;user-select:none">Keep me signed in</label>
-        </div>
+        <div class="field" style="margin-bottom:16px"><label for="l-email">Email address</label><input id="l-email" type="email" name="email" required placeholder="you@example.com" autocomplete="email"></div>
+        <div class="field" style="margin-bottom:6px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><label for="l-password" style="margin:0">Password</label><a href="forgot-password.html" class="tiny" style="color:var(--ink-55);text-decoration:underline">Forgot password?</a></div><div style="position:relative;display:flex;align-items:center"><input id="l-password" type="password" name="password" required placeholder="••••••••" autocomplete="current-password" style="padding-right:52px;width:100%"><button type="button" id="pw-toggle" tabindex="-1" style="position:absolute;right:14px;background:none;border:none;cursor:pointer;color:var(--grey);font-size:.74rem;font-weight:700">SHOW</button></div></div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;margin-top:10px"><input type="checkbox" id="l-remember" checked style="width:auto;cursor:pointer"><label for="l-remember" class="small" style="cursor:pointer;user-select:none">Keep me signed in</label></div>
         <button class="btn btn--dark btn--block" type="submit" id="submit-btn">Log In</button>
       </form>
-
       <div class="divider"><span>or</span></div>
-
-      <button class="google-btn" id="google-btn" type="button">
-        <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22-.03-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
-        Continue with Google
-      </button>
-
+      <button class="google-btn" id="google-btn" type="button"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C1.43 20.53 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22-.03-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06 .56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>Continue with Google</button>
       <p style="text-align:center;margin-top:24px;font-size:.88rem;color:var(--ink-55)">Don't have an account? <a href="signup.html" style="color:var(--ink);font-weight:700;text-decoration:underline">Create account</a></p>
       <p style="text-align:center;margin-top:14px"><a href="index.html" class="tiny muted" style="text-decoration:underline">← Back to store</a></p>
     </div>
   </div>
 </div>
-
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -109,164 +73,24 @@ window.MTECH_IMG={
 <script src="js/navigation.js"></script>
 <script src="js/nav-account-btn.js"></script>
 <script src="js/main.js"></script>
-
 <script>
 (function () {
   "use strict";
-
-  var form = document.getElementById("login-form");
-  var errorBox = document.getElementById("form-error");
-  var submitBtn = document.getElementById("submit-btn");
-  var pwToggle = document.getElementById("pw-toggle");
-  var pwInput = document.getElementById("l-password");
-  var googleBtn = document.getElementById("google-btn");
-  var redirecting = false;
-
-  function showError(msg) {
-    errorBox.textContent = msg;
-    errorBox.style.display = "block";
-  }
-  function hideError() { errorBox.style.display = "none"; }
-
-  function friendlyError(err) {
-    var code = (err && err.code) || "";
-    if (code.includes("user-not-found") || code.includes("wrong-password") || code.includes("invalid-credential")) return "Incorrect email or password. Please check your details and try again.";
-    if (code.includes("too-many-requests")) return "Too many failed attempts. Please wait a few minutes before trying again.";
-    if (code.includes("operation-not-allowed")) return "This sign-in method is not enabled yet in Firebase Authentication. Please enable Email/Password and Google providers in the Firebase Console.";
-    if (code.includes("network")) return "You appear to be offline. Please check your connection and try again.";
-    if (code.includes("unauthorized-domain")) return "This website's domain has not been authorized for sign-in yet. Please add the current Vercel domain under Firebase Authentication → Settings → Authorized domains.";
-    if (code.includes("popup-closed-by-user")) return "The Google sign-in window was closed before finishing. Please try again.";
-    if (code.includes("account-exists-with-different-credential")) return "This Google email already has an M-TECH account using another sign-in method. Sign in with that method first, then link Google from the account settings.";
-    return err.message || "Something went wrong. Please try again.";
-  }
-
-  function setLoading(loading) {
-    submitBtn.disabled = loading;
-    googleBtn.disabled = loading;
-    submitBtn.textContent = loading ? "Signing in…" : "Log In";
-  }
-
-  function redirectAfterLogin(userDoc) {
-    if (redirecting) return;
-
-    var intended = sessionStorage.getItem("mtech_redirect_after_login");
-    sessionStorage.removeItem("mtech_redirect_after_login");
-
-    console.info("[M-TECH login] redirect decision", {
-      page: window.location.pathname,
-      authenticated: !!(MTECH_CONFIG.auth && MTECH_CONFIG.auth.currentUser),
-      uid: MTECH_CONFIG.auth && MTECH_CONFIG.auth.currentUser ? MTECH_CONFIG.auth.currentUser.uid : null,
-      role: userDoc && userDoc.role ? userDoc.role : null,
-      isActive: userDoc && typeof userDoc.isActive === "boolean" ? userDoc.isActive : null,
-      redirectReason: userDoc && userDoc.role === "admin" && userDoc.isActive === true ? "admin" : (intended || "account")
-    });
-
-    if (userDoc && userDoc.role === "admin") {
-      if (userDoc.isActive !== true) {
-        setLoading(false);
-        showError("Your M-TECH administrator account is not active. The account must have role = admin and isActive = true in users/{uid}.");
-        return;
-      }
-      redirecting = true;
-      window.location.href = "admin.html";
-      return;
-    }
-
-    if (intended && !intended.includes("login") && !intended.includes("signup")) {
-      redirecting = true;
-      window.location.href = intended;
-      return;
-    }
-
-    redirecting = true;
-    window.location.href = "account.html";
-  }
-
-  async function bootstrapAuth() {
-    if (!window.MTECH_CONFIG || !MTECH_CONFIG.isEnabled) {
-      showError("M-TECH authentication is not yet configured. Please contact the store owner.");
-      return;
-    }
-
-    /* There must be ONE owner of the post-login decision. Previously the page
-       registered onAuthStateChanged and getRedirectResult independently.
-       Keep redirect-result completion first, then install the normal auth
-       observer for existing sessions. */
-    try {
-      var redirectUserDoc = await MTECH_AUTH.completeGoogleRedirectSignIn();
-      if (redirectUserDoc) {
-        redirectAfterLogin(redirectUserDoc);
-        return;
-      }
-    } catch (err) {
-      console.error("[M-TECH login] Google redirect result failed", {
-        page: window.location.pathname,
-        code: err && err.code ? err.code : "unknown",
-        message: err && err.message ? err.message : "unknown"
-      });
-      showError(friendlyError(err));
-      return;
-    }
-
-    MTECH_AUTH.onAuthStateChanged(async function (user) {
-      if (!user || redirecting) return;
-      try {
-        var profile = await MTECH_AUTH.getCurrentUserDoc();
-        redirectAfterLogin(profile || user);
-      } catch (err) {
-        console.error("[M-TECH login] profile lookup failed", {
-          page: window.location.pathname,
-          uid: user.uid,
-          code: err && err.code ? err.code : "unknown",
-          message: err && err.message ? err.message : "unknown"
-        });
-        setLoading(false);
-        showError("Authentication succeeded, but the M-TECH user profile could not be verified. Check the browser console for the safe diagnostic details.");
-      }
-    });
-  }
-
+  var form=document.getElementById("login-form"), errorBox=document.getElementById("form-error"), submitBtn=document.getElementById("submit-btn"), pwToggle=document.getElementById("pw-toggle"), pwInput=document.getElementById("l-password"), googleBtn=document.getElementById("google-btn"), redirecting=false;
+  console.info("[M-TECH Google] login controller initialized");
+  console.info("[M-TECH Google] google button found:",!!googleBtn);
+  console.info("[M-TECH Google] google auth function available:",!!(window.MTECH_AUTH&&typeof MTECH_AUTH.logInWithGoogle==="function"));
+  function showError(msg){errorBox.textContent=msg;errorBox.style.display="block";}
+  function hideError(){errorBox.style.display="none";}
+  function friendlyError(err){var code=(err&&err.code)||"";if(code.includes("user-not-found")||code.includes("wrong-password")||code.includes("invalid-credential"))return "Incorrect email or password. Please check your details and try again.";if(code.includes("too-many-requests"))return "Too many failed attempts. Please wait a few minutes before trying again.";if(code.includes("operation-not-allowed"))return "This sign-in method is not enabled yet in Firebase Authentication. Please enable Email/Password and Google providers in the Firebase Console.";if(code.includes("network"))return "You appear to be offline. Please check your connection and try again.";if(code.includes("unauthorized-domain"))return "This website's domain has not been authorized for sign-in yet. Please add the current Vercel domain under Firebase Authentication → Settings → Authorized domains.";if(code.includes("popup-closed-by-user"))return "The Google sign-in window was closed before finishing. Please try again.";if(code.includes("account-exists-with-different-credential"))return "This Google email already has an M-TECH account using another sign-in method. Sign in with that method first, then link Google from the account settings.";return err&&err.message?err.message:"Something went wrong. Please try again.";}
+  function setLoading(loading){submitBtn.disabled=loading;googleBtn.disabled=loading;submitBtn.textContent=loading?"Signing in…":"Log In";}
+  function redirectAfterLogin(userDoc){if(redirecting)return;var intended=sessionStorage.getItem("mtech_redirect_after_login");sessionStorage.removeItem("mtech_redirect_after_login");console.info("[M-TECH login] redirect decision",{page:window.location.pathname,authenticated:!!(MTECH_CONFIG.auth&&MTECH_CONFIG.auth.currentUser),uid:MTECH_CONFIG.auth&&MTECH_CONFIG.auth.currentUser?MTECH_CONFIG.auth.currentUser.uid:null,role:userDoc&&userDoc.role?userDoc.role:null,isActive:userDoc&&typeof userDoc.isActive==="boolean"?userDoc.isActive:null,redirectReason:userDoc&&userDoc.role==="admin"&&userDoc.isActive===true?"admin":(intended||"account")});if(userDoc&&userDoc.role==="admin"){if(userDoc.isActive!==true){setLoading(false);showError("Your M-TECH administrator account is not active. The account must have role = admin and isActive = true in users/{uid}.");return;}redirecting=true;window.location.href="admin.html";return;}if(intended&&!intended.includes("login")&&!intended.includes("signup")){redirecting=true;window.location.href=intended;return;}redirecting=true;window.location.href="account.html";}
+  async function bootstrapAuth(){if(!window.MTECH_CONFIG||!MTECH_CONFIG.isEnabled){showError("M-TECH authentication is not yet configured. Please contact the store owner.");return;}try{var redirectUserDoc=await MTECH_AUTH.completeGoogleRedirectSignIn();if(redirectUserDoc){redirectAfterLogin(redirectUserDoc);return;}}catch(err){console.error("[M-TECH login] Google redirect result failed",{page:window.location.pathname,code:err&&err.code?err.code:"unknown",message:err&&err.message?err.message:"unknown"});showError(friendlyError(err));return;}MTECH_AUTH.onAuthStateChanged(async function(user){if(!user||redirecting)return;try{var profile=await MTECH_AUTH.getCurrentUserDoc();redirectAfterLogin(profile||user);}catch(err){console.error("[M-TECH login] profile lookup failed",{page:window.location.pathname,uid:user.uid,code:err&&err.code?err.code:"unknown",message:err&&err.message?err.message:"unknown"});setLoading(false);showError("Authentication succeeded, but the M-TECH user profile could not be verified. Check the browser console for the safe diagnostic details.");}});}
+  pwToggle.addEventListener("click",function(){pwInput.type=pwInput.type==="password"?"text":"password";pwToggle.textContent=pwInput.type==="password"?"SHOW":"HIDE";});
+  form.addEventListener("submit",async function(e){e.preventDefault();hideError();if(!form.checkValidity()){form.reportValidity();return;}if(!MTECH_CONFIG.isEnabled){showError("Firebase is not configured yet.");return;}setLoading(true);var email=document.getElementById("l-email").value.trim(),password=pwInput.value,remember=document.getElementById("l-remember").checked;try{var userDoc=await MTECH_AUTH.logIn(email,password,remember);redirectAfterLogin(userDoc);}catch(err){setLoading(false);showError(friendlyError(err));}});
+  googleBtn.addEventListener("click",async function(event){console.info("[M-TECH Google] BUTTON CLICK DETECTED");console.info("[M-TECH Google] calling logInWithGoogle()",{defaultPrevented:!!(event&&event.defaultPrevented),targetId:event&&event.currentTarget?event.currentTarget.id:null,buttonDisabled:!!googleBtn.disabled});hideError();if(!MTECH_CONFIG.isEnabled){console.error("[M-TECH Google] Firebase is disabled before authentication starts");showError("Firebase is not configured yet.");return;}setLoading(true);try{var userDoc=await MTECH_AUTH.logInWithGoogle();console.info("[M-TECH Google] logInWithGoogle() returned",{authenticated:!!(MTECH_CONFIG.auth&&MTECH_CONFIG.auth.currentUser),uid:MTECH_CONFIG.auth&&MTECH_CONFIG.auth.currentUser?MTECH_CONFIG.auth.currentUser.uid:null,profileReturned:!!userDoc});if(userDoc)redirectAfterLogin(userDoc);}catch(err){console.error("[M-TECH Google] login controller caught authentication error",{code:err&&err.code?err.code:"unknown",message:err&&err.message?err.message:"unknown"});setLoading(false);showError(friendlyError(err));}});
   bootstrapAuth();
-
-  pwToggle.addEventListener("click", function () {
-    pwInput.type = pwInput.type === "password" ? "text" : "password";
-    pwToggle.textContent = pwInput.type === "password" ? "SHOW" : "HIDE";
-  });
-
-  form.addEventListener("submit", async function (e) {
-    e.preventDefault();
-    hideError();
-    if (!form.checkValidity()) { form.reportValidity(); return; }
-    if (!MTECH_CONFIG.isEnabled) { showError("Firebase is not configured yet."); return; }
-
-    setLoading(true);
-    var email = document.getElementById("l-email").value.trim();
-    var password = pwInput.value;
-    var remember = document.getElementById("l-remember").checked;
-
-    try {
-      var userDoc = await MTECH_AUTH.logIn(email, password, remember);
-      redirectAfterLogin(userDoc);
-    } catch (err) {
-      setLoading(false);
-      showError(friendlyError(err));
-    }
-  });
-
-  googleBtn.addEventListener("click", async function () {
-    hideError();
-    if (!MTECH_CONFIG.isEnabled) { showError("Firebase is not configured yet."); return; }
-    setLoading(true);
-    try {
-      var userDoc = await MTECH_AUTH.logInWithGoogle();
-      if (userDoc) redirectAfterLogin(userDoc);
-    } catch (err) {
-      setLoading(false);
-      showError(friendlyError(err));
-    }
-  });
-
-  document.addEventListener("DOMContentLoaded", initNavigation);
+  document.addEventListener("DOMContentLoaded",initNavigation);
 })();
 </script>
 </body>
