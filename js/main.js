@@ -128,7 +128,7 @@ async function syncPublicFirestoreData() {
     if (Array.isArray(window.products)) {
       window.products.splice.apply(window.products, [0, window.products.length].concat(liveProducts));
     }
-    document.querySelectorAll("[data-catalog]").forEach(function (block) { if (typeof initCatalog === "function") initCatalog(block); });
+    window.dispatchEvent(new CustomEvent("mtech-catalog-reload"));
     document.querySelectorAll("[data-products]").forEach(function (el) {
       var ids = el.getAttribute("data-products").split(",").map(function (s) { return s.trim(); });
       renderProducts(el, ids.map(getProduct).filter(Boolean), { eager: false });
