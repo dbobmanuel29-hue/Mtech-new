@@ -1,8 +1,11 @@
 /* M-TECH Admin CRUD persistence repair
    --------------------------------------------------------------------------
    Firestore is the source of truth for Admin CRUD operations.
-   This layer deliberately uses the existing MTECH_DB service and preserves
-   every form/schema already assembled by admin-core.js.
+   This layer preserves the existing Admin forms and schema while making every
+   mutation server-verified. It also bootstraps the existing static catalogue
+   into Firestore when the products collection is genuinely empty, because the
+   repository already contains an explicit initial catalogue but was not
+   invoking its initialization routine.
 
    Authentication, Firestore rules, Firebase configuration and UI are untouched.
 */
@@ -13,9 +16,8 @@
     return !!(window.MTECH_CONFIG && MTECH_CONFIG.isEnabled && MTECH_CONFIG.db);
   }
 
-  /* MTECH_DB is declared as a top-level const in firebase-db.js, so it is a
-     global lexical binding but not a window property. The previous repair
-     incorrectly checked window.MTECH_DB and therefore never installed. */
+  /* MTECH_DB is a top-level const in firebase-db.js. Top-level const bindings
+     are available to later classic scripts but are not window properties. */
   function dbServiceReady() {
     return (typeof MTECH_DB !== "undefined" && MTECH_DB);
   }
@@ -70,9 +72,8 @@
       try {
         var db = await ensureOnline();
         if (!id) throw new Error("A document ID is required for " + collection + ".");
-        if (!data || typeof data !== "object") throw new Error("Valid product/content data is required.");
+        if (!data || typeof data !== "object") throw new Error("Valid content data is required.");
 
-        /* Preserve the exact schema produced by the existing Admin forms. */
         await db.collection(collection).doc(id).set(data, { merge: true });
         return await verifyWrite(collection, id);
       } catch (error) {
@@ -137,12 +138,45 @@
     return true;
   }
 
-  function install() {
-    if (!dbReady()) {
-      setTimeout(install, 100);
-      return;
+  async function bootstrapExistingProducts() {
+    var db = await ensureOnline();
+    var existing = await db.collection("products").limit(1).get({ source: "server" });
+    if (!existing.empty) return false;
+
+    if (typeof products === "undefined" || !Array.isArray(products) || !products.length) {
+      console.warn("[M-TECH CRUD] Products collection is empty and no static catalogue is available to bootstrap.");
+      return false;
     }
-    if (!dbServiceReady()) {
+
+    console.log("[M-TECH CRUD] Products collection is empty; bootstrapping the existing catalogue into Firestore.");
+    var batch = db.batch();
+    products.forEach(function (p) {
+      if (!p || !p.id) return;
+      var ref = db.collection("products").doc(String(p.id));
+      batch.set(ref, Object.assign({}, p, {
+        status: p.status || "published",
+        stockQuantity: p.stockQuantity == null ? (p.category === "Accessories" ? 25 : 5) : p.stockQuantity,
+        showStockQuantity: p.showStockQuantity === true,
+        views: Number(p.views || 0),
+        whatsappClicks: Number(p.whatsappClicks || 0),
+        createdAt: p.createdAt || firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }), { merge: true });
+    });
+    await batch.commit();
+
+    var verify = await db.collection("products").get({ source: "server" });
+    if (verify.empty) {
+      var failed = new Error("The catalogue bootstrap completed without any products being readable from Firestore.");
+      failed.code = "mtech/bootstrap-verification-failed";
+      throw failed;
+    }
+    console.log("[M-TECH CRUD] SERVER VERIFIED CATALOGUE BOOTSTRAP", verify.size + " products");
+    return true;
+  }
+
+  async function install() {
+    if (!dbReady() || !dbServiceReady()) {
       setTimeout(install, 100);
       return;
     }
@@ -158,6 +192,23 @@
     wrapSettings();
 
     console.log("[M-TECH CRUD] Firestore server-verified CRUD layer installed");
+
+    /* The repository already has an initial catalogue, but its existing
+       initializeDatabase() routine is not invoked anywhere. Bootstrap only
+       when Firestore truly has zero products, then reload once so the Admin
+       list is populated from Firestore rather than the static array. */
+    try {
+      if (window.__MTECH_PRODUCT_BOOTSTRAP_STARTED) return;
+      window.__MTECH_PRODUCT_BOOTSTRAP_STARTED = true;
+      var seeded = await bootstrapExistingProducts();
+      if (seeded && location.pathname.toLowerCase().indexOf("admin.html") !== -1) {
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error("[M-TECH CRUD] Product bootstrap failed", error);
+      /* Do not hide this failure: the Admin form/list remains usable and the
+         exact error is available in the console. */
+    }
   }
 
   install();
