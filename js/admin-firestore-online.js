@@ -1,0 +1,64 @@
+/* M-TECH Admin Firestore online/consistency guard.
+   Admin CRUD must read the real Firestore backend rather than silently
+   presenting an empty/stale local cache as the database state. */
+(function () {
+  "use strict";
+
+  if (!window.firebase || !window.MTECH_CONFIG || !MTECH_CONFIG.isEnabled) return;
+
+  var db = MTECH_CONFIG.db;
+
+  // Keep the admin console online. A failed enableNetwork is surfaced by the
+  // normal CRUD operation instead of being hidden as a successful save.
+  db.enableNetwork().catch(function (err) {
+    console.warn("[M-TECH ADMIN FIRESTORE] Network enable failed:", err && err.message);
+  });
+
+  // Admin list/read operations previously used Firestore's default get(),
+  // which may fall back to an empty/stale cache when the connection is bad.
+  // Force the backend for calls that do not explicitly choose a source.
+  function forceServerGet(proto) {
+    if (!proto || !proto.get || proto.__mtechServerGetWrapped) return;
+    var originalGet = proto.get;
+    proto.get = function (options) {
+      if (options == null) options = { source: "server" };
+      return originalGet.call(this, options);
+    };
+    proto.__mtechServerGetWrapped = true;
+  }
+
+  try {
+    forceServerGet(firebase.firestore.Query && firebase.firestore.Query.prototype);
+    forceServerGet(firebase.firestore.DocumentReference && firebase.firestore.DocumentReference.prototype);
+  } catch (err) {
+    console.warn("[M-TECH ADMIN FIRESTORE] Could not install server-read guard:", err && err.message);
+  }
+
+  async function verifySaved(collection, id) {
+    var snap = await db.collection(collection).doc(id).get({ source: "server" });
+    if (!snap.exists) {
+      throw new Error("Firestore did not confirm the saved " + collection + " record. The write did not reach the server.");
+    }
+    console.log("[M-TECH ADMIN FIRESTORE] Confirmed server save:", collection + "/" + id);
+    return snap;
+  }
+
+  function wrapSave(name, collection) {
+    if (!window.MTECH_DB || typeof MTECH_DB[name] !== "function") return;
+    var original = MTECH_DB[name];
+    if (original.__mtechVerified) return;
+
+    var wrapped = async function (id, data) {
+      await db.enableNetwork();
+      await original.call(MTECH_DB, id, data);
+      await verifySaved(collection, id);
+    };
+    wrapped.__mtechVerified = true;
+    MTECH_DB[name] = wrapped;
+  }
+
+  wrapSave("saveProduct", "products");
+  wrapSave("saveCategory", "categories");
+  wrapSave("saveTestimonial", "testimonials");
+  wrapSave("savePromotion", "promotions");
+})();
