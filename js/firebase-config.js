@@ -57,3 +57,6 @@ const MTECH_CONFIG = {
 window.firebaseConfig = firebaseConfig;
 window.cloudinaryConfig = cloudinaryConfig;
 window.MTECH_CONFIG = MTECH_CONFIG;
+
+/* Load the category bridge on every Firebase-enabled storefront/admin page. */
+document.write('<script src="/js/category-sync-fix.js"><\\/script>');
