@@ -1,11 +1,8 @@
 /* M-TECH Admin CRUD persistence repair
    --------------------------------------------------------------------------
-   This layer sits after admin-core.js so the existing dashboard forms remain
-   unchanged. It makes Firestore the source of truth for Admin CRUD operations:
-   - every write is sent to the backend with the network enabled
-   - every write is read back from the server and verified
-   - deletes are also verified against the server
-   - failures are surfaced to the existing form error handler
+   Firestore is the source of truth for Admin CRUD operations.
+   This layer deliberately uses the existing MTECH_DB service and preserves
+   every form/schema already assembled by admin-core.js.
 
    Authentication, Firestore rules, Firebase configuration and UI are untouched.
 */
@@ -16,10 +13,17 @@
     return !!(window.MTECH_CONFIG && MTECH_CONFIG.isEnabled && MTECH_CONFIG.db);
   }
 
+  /* MTECH_DB is declared as a top-level const in firebase-db.js, so it is a
+     global lexical binding but not a window property. The previous repair
+     incorrectly checked window.MTECH_DB and therefore never installed. */
+  function dbServiceReady() {
+    return (typeof MTECH_DB !== "undefined" && MTECH_DB);
+  }
+
   function firebaseError(error, action, collection, id) {
     var code = error && error.code ? error.code : "unknown";
     var message = error && error.message ? error.message : String(error || "Unknown Firestore error");
-    var detail = "" + action + " " + collection + "/" + id + " failed [" + code + "]: " + message;
+    var detail = action + " " + collection + "/" + id + " failed [" + code + "]: " + message;
     console.error("[M-TECH CRUD] " + detail, error);
     var wrapped = new Error(detail);
     wrapped.code = code;
@@ -37,9 +41,11 @@
     var db = MTECH_CONFIG.db;
     var snap = await db.collection(collection).doc(id).get({ source: "server" });
     if (!snap.exists) {
-      throw new Error("Firestore did not confirm " + collection + "/" + id + " after the save. The write did not reach the server.");
+      var missing = new Error("Firestore did not confirm " + collection + "/" + id + " after the save.");
+      missing.code = "mtech/verification-failed";
+      throw missing;
     }
-    console.log("[M-TECH CRUD] SERVER VERIFIED SAVE", collection + "/" + id);
+    console.log("[M-TECH CRUD] SERVER VERIFIED SAVE", collection + "/" + id, snap.data());
     return { id: snap.id, data: snap.data() };
   }
 
@@ -47,69 +53,79 @@
     var db = MTECH_CONFIG.db;
     var snap = await db.collection(collection).doc(id).get({ source: "server" });
     if (snap.exists) {
-      throw new Error("Firestore still contains " + collection + "/" + id + " after delete. The delete was not confirmed by the server.");
+      var stillThere = new Error("Firestore still contains " + collection + "/" + id + " after delete.");
+      stillThere.code = "mtech/delete-verification-failed";
+      throw stillThere;
     }
     console.log("[M-TECH CRUD] SERVER VERIFIED DELETE", collection + "/" + id);
   }
 
   function wrapSave(name, collection) {
-    if (!window.MTECH_DB || typeof MTECH_DB[name] !== "function") return;
-    if (MTECH_DB[name].__mtechCrudRepair) return;
+    var service = dbServiceReady();
+    if (!service || typeof service[name] !== "function") return false;
+    if (service[name].__mtechCrudRepair) return true;
 
-    var original = MTECH_DB[name];
+    var original = service[name];
     var wrapped = async function (id, data) {
       try {
         var db = await ensureOnline();
-        var ref = db.collection(collection).doc(id);
+        if (!id) throw new Error("A document ID is required for " + collection + ".");
+        if (!data || typeof data !== "object") throw new Error("Valid product/content data is required.");
 
-        /* Use the existing schema/data assembled by the Admin dashboard. */
-        await ref.set(data, { merge: true });
-        var verified = await verifyWrite(collection, id);
-
-        /* Preserve the existing API contract while returning the verified data. */
-        return verified;
+        /* Preserve the exact schema produced by the existing Admin forms. */
+        await db.collection(collection).doc(id).set(data, { merge: true });
+        return await verifyWrite(collection, id);
       } catch (error) {
-        throw firebaseError(error, "Save", collection, id);
+        throw firebaseError(error, "Save", collection, id || "<missing-id>");
       }
     };
     wrapped.__mtechCrudRepair = true;
     wrapped.__original = original;
-    MTECH_DB[name] = wrapped;
+    service[name] = wrapped;
+    return true;
   }
 
   function wrapDelete(name, collection) {
-    if (!window.MTECH_DB || typeof MTECH_DB[name] !== "function") return;
-    if (MTECH_DB[name].__mtechCrudRepair) return;
+    var service = dbServiceReady();
+    if (!service || typeof service[name] !== "function") return false;
+    if (service[name].__mtechCrudRepair) return true;
 
-    var original = MTECH_DB[name];
+    var original = service[name];
     var wrapped = async function (id) {
       try {
         var db = await ensureOnline();
+        if (!id) throw new Error("A document ID is required for " + collection + ".");
         await db.collection(collection).doc(id).delete();
         await verifyDelete(collection, id);
         return true;
       } catch (error) {
-        throw firebaseError(error, "Delete", collection, id);
+        throw firebaseError(error, "Delete", collection, id || "<missing-id>");
       }
     };
     wrapped.__mtechCrudRepair = true;
     wrapped.__original = original;
-    MTECH_DB[name] = wrapped;
+    service[name] = wrapped;
+    return true;
   }
 
   function wrapSettings() {
-    if (!window.MTECH_DB || typeof MTECH_DB.updateSettings !== "function") return;
-    if (MTECH_DB.updateSettings.__mtechCrudRepair) return;
+    var service = dbServiceReady();
+    if (!service || typeof service.updateSettings !== "function") return false;
+    if (service.updateSettings.__mtechCrudRepair) return true;
 
-    var original = MTECH_DB.updateSettings;
+    var original = service.updateSettings;
     var wrapped = async function (data) {
       try {
         var db = await ensureOnline();
         var ref = db.collection("siteSettings").doc("main");
         await ref.set(data, { merge: true });
         var snap = await ref.get({ source: "server" });
-        if (!snap.exists) throw new Error("Firestore did not confirm siteSettings/main after save.");
-        console.log("[M-TECH CRUD] SERVER VERIFIED SAVE siteSettings/main");
+        if (!snap.exists) {
+          var missing = new Error("Firestore did not confirm siteSettings/main after save.");
+          missing.code = "mtech/verification-failed";
+          throw missing;
+        }
+        console.log("[M-TECH CRUD] SERVER VERIFIED SAVE siteSettings/main", snap.data());
         return snap.data();
       } catch (error) {
         throw firebaseError(error, "Save", "siteSettings", "main");
@@ -117,13 +133,17 @@
     };
     wrapped.__mtechCrudRepair = true;
     wrapped.__original = original;
-    MTECH_DB.updateSettings = wrapped;
+    service.updateSettings = wrapped;
+    return true;
   }
 
   function install() {
-    if (!window.MTECH_DB) {
-      console.warn("[M-TECH CRUD] MTECH_DB is not available yet; retrying.");
-      setTimeout(install, 50);
+    if (!dbReady()) {
+      setTimeout(install, 100);
+      return;
+    }
+    if (!dbServiceReady()) {
+      setTimeout(install, 100);
       return;
     }
 
