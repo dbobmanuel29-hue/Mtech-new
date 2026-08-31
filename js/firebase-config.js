@@ -58,5 +58,10 @@ window.firebaseConfig = firebaseConfig;
 window.cloudinaryConfig = cloudinaryConfig;
 window.MTECH_CONFIG = MTECH_CONFIG;
 
-/* Load the category bridge on every Firebase-enabled storefront/admin page. */
-document.write('<script src="/js/category-sync-fix.js"><\\/script>');
+/* Load the category bridge without interfering with Firebase/auth startup. */
+(function () {
+  var s = document.createElement("script");
+  s.src = "/js/category-sync-fix.js";
+  s.async = false;
+  document.head.appendChild(s);
+})();
