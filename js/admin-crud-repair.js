@@ -212,16 +212,10 @@
 
     console.log("[M-TECH CRUD] Firestore server-verified CRUD layer installed");
 
-    try {
-      if (window.__MTECH_PRODUCT_BOOTSTRAP_STARTED) return;
-      window.__MTECH_PRODUCT_BOOTSTRAP_STARTED = true;
-      var seeded = await bootstrapExistingProducts();
-      if (seeded && location.pathname.toLowerCase().indexOf("admin.html") !== -1) {
-        window.location.reload();
-      }
-    } catch (error) {
-      console.error("[M-TECH CRUD] Product bootstrap failed", error);
-    }
+    /* Do not bootstrap or reseed products automatically during dashboard load.
+       Production data already lives in Firestore, and automatic bootstrap can
+       race with the normal dashboard reads and the legacy initializer. */
+    window.__MTECH_PRODUCT_BOOTSTRAP_DISABLED = true;
   }
 
   install();
