@@ -88,7 +88,13 @@
     watchNotifications();
   }
 
-  document.addEventListener("DOMContentLoaded", function () {
+  /* Admin core is loaded dynamically by js/admin.js. If we wait only for
+     DOMContentLoaded here, that event may already have fired before this
+     module is inserted, leaving the access gate stuck forever. */
+  function initAdminAccessGate() {
+    if (window.__MTECH_ADMIN_ACCESS_GATE_INITIALIZED) return;
+    window.__MTECH_ADMIN_ACCESS_GATE_INITIALIZED = true;
+
     if (!window.MTECH_CONFIG || !MTECH_CONFIG.isEnabled) {
       showDenied(
         "Firebase is not configured yet",
@@ -96,6 +102,13 @@
       );
       return;
     }
+
+    if (!window.MTECH_AUTH || typeof MTECH_AUTH.onAuthStateChanged !== "function") {
+      window.__MTECH_ADMIN_ACCESS_GATE_INITIALIZED = false;
+      setTimeout(initAdminAccessGate, 50);
+      return;
+    }
+
     MTECH_AUTH.onAuthStateChanged(function (user) {
       if (!user) {
         showDenied("You need to sign in", "Log in with an M-TECH administrator account to open this dashboard.");
@@ -107,7 +120,13 @@
       }
       boot(user);
     });
-  });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initAdminAccessGate, { once: true });
+  } else {
+    initAdminAccessGate();
+  }
 
   /* -------------------------------------------------------- navigation */
   document.addEventListener("click", function (e) {
