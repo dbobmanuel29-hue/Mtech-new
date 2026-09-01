@@ -999,28 +999,40 @@
   });
 
   /* ----------------------------------------------------- notifications */
-  function watchNotifications() {
+  async function watchNotifications() {
+    /* Use a one-time read instead of a long-lived Firestore listener here.
+       The dashboard does not need a persistent stream just to paint the
+       notification panel, and this avoids the Firestore listen-channel
+       assertion that was breaking the rest of the admin session. */
     try {
-      MTECH_CONFIG.db.collection("notifications")
+      var snap = await MTECH_CONFIG.db.collection("notifications")
         .where("recipientRole", "==", "admin")
-        .orderBy("createdAt", "desc").limit(20)
-        .onSnapshot(function (snap) {
-          var items = [];
-          snap.forEach(function (d) { items.push(Object.assign({ id: d.id }, d.data())); });
-          var unread = items.filter(function (n) { return !n.read; }).length;
-          var dot = $("notif-dot");
-          dot.style.display = unread ? "grid" : "none";
-          dot.textContent = unread > 9 ? "9+" : unread;
+        .orderBy("createdAt", "desc").limit(20).get();
 
-          $("notif-list").innerHTML = items.length ? items.map(function (n) {
-            return '<div class="notif-item' + (n.read ? "" : " unread") + '" data-notif="' + n.id + '">' +
-              '<b style="display:block;font-size:.84rem">' + esc(n.title) + '</b>' +
-              '<span class="tiny muted">' + esc(n.message) + '</span>' +
-              '<div class="tiny muted" style="margin-top:4px">' + fmtDate(n.createdAt) + '</div>' +
-            '</div>';
-          }).join("") : '<div class="notif-item muted">No notifications yet.</div>';
-        }, function (err) { console.warn("Notifications listener:", err.message); });
-    } catch (e) { console.warn(e); }
+      var items = [];
+      snap.forEach(function (d) { items.push(Object.assign({ id: d.id }, d.data())); });
+      var unread = items.filter(function (n) { return !n.read; }).length;
+      var dot = $("notif-dot");
+      if (dot) {
+        dot.style.display = unread ? "grid" : "none";
+        dot.textContent = unread > 9 ? "9+" : unread;
+      }
+
+      var list = $("notif-list");
+      if (list) {
+        list.innerHTML = items.length ? items.map(function (n) {
+          return '<div class="notif-item' + (n.read ? "" : " unread") + '" data-notif="' + n.id + '">' +
+            '<b style="display:block;font-size:.84rem">' + esc(n.title) + '</b>' +
+            '<span class="tiny muted">' + esc(n.message) + '</span>' +
+            '<div class="tiny muted" style="margin-top:4px">' + fmtDate(n.createdAt) + '</div>' +
+          '</div>';
+        }).join("") : '<div class="notif-item muted">No notifications yet.</div>';
+      }
+    } catch (err) {
+      console.warn("[M-TECH ADMIN] Notifications read skipped:", err && err.code, err && err.message);
+      var list = $("notif-list");
+      if (list) list.innerHTML = '<div class="notif-item muted">Notifications unavailable right now.</div>';
+    }
   }
 
   document.addEventListener("click", function (e) {
