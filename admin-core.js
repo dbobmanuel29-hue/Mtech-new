@@ -154,63 +154,115 @@
     }
   });
 
+  /* ----------------------------------------------------- Firestore reads */
+  async function readAdminCollection(name) {
+    var ref = MTECH_CONFIG.db.collection(name);
+    var lastError = null;
+
+    // Prefer the backend so the admin does not mistake an old empty cache for
+    // the database. If the backend is temporarily unavailable, fall back to
+    // the SDK's normal read behaviour rather than blanking the entire console.
+    try {
+      return await ref.get({ source: "server" });
+    } catch (err) {
+      lastError = err;
+      console.warn("[M-TECH ADMIN] Server read failed for " + name + ", retrying:", err && err.code, err && err.message);
+      try {
+        return await ref.get();
+      } catch (fallbackErr) {
+        fallbackErr.mtechPreviousError = lastError;
+        throw fallbackErr;
+      }
+    }
+  }
+
+  function setStat(id, value) {
+    var el = $(id);
+    if (el) el.textContent = String(value);
+  }
+
   /* ---------------------------------------------------------- overview */
   async function loadOverview() {
-    try {
-      var db = MTECH_CONFIG.db;
-      var prodSnap = await db.collection("products").get();
-      var list = [];
-      prodSnap.forEach(function (d) { list.push(Object.assign({ id: d.id }, d.data())); });
+    // Each dashboard metric is loaded independently. One unavailable collection
+    // must never leave products, users and every other card stuck at "—".
+    var names = ["products", "sellRequests", "swapRequests", "enquiries", "users"];
+    var results = await Promise.allSettled(names.map(readAdminCollection));
 
-      $("s-total").textContent = list.length;
-      $("s-avail").textContent = list.filter(function (p) { return p.availability !== "Out of stock" && p.status === "published"; }).length;
-      $("s-out").textContent = list.filter(function (p) { return p.status === "out_of_stock" || p.availability === "Out of stock"; }).length;
-      $("s-feat").textContent = list.filter(function (p) { return p.featured; }).length;
-      $("c-products").textContent = list.length;
+    var byName = {};
+    names.forEach(function (name, index) {
+      byName[name] = results[index];
+      if (results[index].status === "rejected") {
+        console.error("[M-TECH ADMIN] Could not load " + name + ":", results[index].reason);
+      }
+    });
 
-      var sellSnap = await db.collection("sellRequests").where("status", "==", "new").get();
-      var swapSnap = await db.collection("swapRequests").where("status", "==", "new").get();
-      var enqSnap = await db.collection("enquiries").orderBy("createdAt", "desc").limit(50).get();
-      var userSnap = await db.collection("users").get();
-
-      $("s-sell").textContent = sellSnap.size;
-      $("s-swap").textContent = swapSnap.size;
-      $("s-enq").textContent = enqSnap.size;
-      $("s-users").textContent = userSnap.size;
-      $("c-sell").textContent = sellSnap.size;
-      $("c-swap").textContent = swapSnap.size;
-      $("c-enq").textContent = enqSnap.size;
-
-      var viewed = list.slice().sort(function (a, b) { return (b.views || 0) - (a.views || 0); }).slice(0, 5);
-      $("top-viewed").innerHTML = viewed.length
-        ? viewed.map(function (p) {
-            return '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)"><span>' +
-              esc(p.name) + '</span><b>' + (p.views || 0) + ' views</b></div>';
-          }).join("")
-        : '<p class="muted">No view data yet.</p>';
-
-      var clicked = list.slice().sort(function (a, b) { return (b.whatsappClicks || 0) - (a.whatsappClicks || 0); }).slice(0, 5);
-      $("top-clicked").innerHTML = clicked.length
-        ? clicked.map(function (p) {
-            return '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)"><span>' +
-              esc(p.name) + '</span><b>' + (p.whatsappClicks || 0) + ' clicks</b></div>';
-          }).join("")
-        : '<p class="muted">No enquiry data yet.</p>';
-    } catch (err) {
-      console.error("Overview error:", err);
+    var productList = [];
+    if (byName.products.status === "fulfilled") {
+      byName.products.value.forEach(function (d) {
+        productList.push(Object.assign({ id: d.id }, d.data()));
+      });
     }
+
+    setStat("s-total", productList.length);
+    setStat("s-avail", productList.filter(function (p) {
+      return p.availability !== "Out of stock" && (p.status || "published") === "published";
+    }).length);
+    setStat("s-out", productList.filter(function (p) {
+      return p.status === "out_of_stock" || p.availability === "Out of stock";
+    }).length);
+    setStat("s-feat", productList.filter(function (p) { return p.featured; }).length);
+    setStat("c-products", productList.length);
+
+    function countWhere(name, predicate) {
+      if (!byName[name] || byName[name].status !== "fulfilled") return 0;
+      var count = 0;
+      byName[name].value.forEach(function (d) { if (predicate(d.data())) count++; });
+      return count;
+    }
+
+    var sellCount = countWhere("sellRequests", function (d) { return d.status === "new"; });
+    var swapCount = countWhere("swapRequests", function (d) { return d.status === "new"; });
+    var enqCount = byName.enquiries && byName.enquiries.status === "fulfilled" ? byName.enquiries.value.size : 0;
+    var userCount = byName.users && byName.users.status === "fulfilled" ? byName.users.value.size : 0;
+
+    setStat("s-sell", sellCount);
+    setStat("s-swap", swapCount);
+    setStat("s-enq", enqCount);
+    setStat("s-users", userCount);
+    setStat("c-sell", sellCount);
+    setStat("c-swap", swapCount);
+    setStat("c-enq", enqCount);
+
+    var viewed = productList.slice().sort(function (a, b) { return (b.views || 0) - (a.views || 0); }).slice(0, 5);
+    $("top-viewed").innerHTML = viewed.length
+      ? viewed.map(function (p) {
+          return '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)"><span>' +
+            esc(p.name) + '</span><b>' + (p.views || 0) + ' views</b></div>';
+        }).join("")
+      : '<p class="muted">No view data yet.</p>';
+
+    var clicked = productList.slice().sort(function (a, b) { return (b.whatsappClicks || 0) - (a.whatsappClicks || 0); }).slice(0, 5);
+    $("top-clicked").innerHTML = clicked.length
+      ? clicked.map(function (p) {
+          return '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)"><span>' +
+            esc(p.name) + '</span><b>' + (p.whatsappClicks || 0) + ' clicks</b></div>';
+        }).join("")
+      : '<p class="muted">No enquiry data yet.</p>';
   }
 
   /* ---------------------------------------------------------- products */
   async function loadProducts() {
     try {
-      var snap = await MTECH_CONFIG.db.collection("products").get();
+      var snap = await readAdminCollection("products");
       ADMIN.products = [];
       snap.forEach(function (d) { ADMIN.products.push(Object.assign({ id: d.id }, d.data())); });
       ADMIN.page = 1;
       renderProducts();
+      setStat("c-products", ADMIN.products.length);
+      console.log("[M-TECH ADMIN] Loaded " + ADMIN.products.length + " products from Firestore.");
     } catch (err) {
-      $("prod-tbody").innerHTML = '<tr><td colspan="6" style="padding:30px;text-align:center;color:#95271f">Could not load products: ' + esc(err.message) + '</td></tr>';
+      console.error("[M-TECH ADMIN] Product loader failed:", err);
+      $("prod-tbody").innerHTML = '<tr><td colspan="6" style="padding:30px;text-align:center;color:#95271f">Could not load products: ' + esc((err.code ? err.code + " — " : "") + err.message) + '</td></tr>';
     }
   }
 
