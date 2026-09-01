@@ -522,19 +522,9 @@ const MTECH_DB = {
 // Expose the shared Firestore service for storefront/account/admin scripts.
 window.MTECH_DB = MTECH_DB;
 
-/* Seed the database only AFTER products.js has defined CATEGORIES / products
-   AND verifying that the authenticated user is an administrator (role == "admin").
-   This prevents arbitrary public visitors from seeding or attempting unauthorized writes. */
-document.addEventListener("DOMContentLoaded", function () {
-  if (MTECH_CONFIG.isEnabled &&
-      typeof CATEGORIES !== "undefined" &&
-      typeof products !== "undefined" &&
-      window.MTECH_AUTH) {
-    MTECH_AUTH.onAuthStateChanged(async function (user) {
-      if (user && user.role === "admin") {
-        console.log("Admin detected. Verifying and seeding default collections if empty...");
-        await MTECH_DB.initializeDatabase();
-      }
-    });
-  }
-});
+/* Automatic catalogue seeding is intentionally disabled.
+   The database is now the source of truth and the admin CRUD layer handles
+   explicit, verified mutations. Running an automatic seed during dashboard
+   startup created a second concurrent Firestore write/read path and could
+   race with the admin loaders. Existing products and categories are preserved. */
+window.MTECH_DB_AUTO_SEED_DISABLED = true;
