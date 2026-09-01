@@ -14,25 +14,10 @@
     console.warn("[M-TECH ADMIN FIRESTORE] Network enable failed:", err && err.message);
   });
 
-  // Admin list/read operations previously used Firestore's default get(),
-  // which may fall back to an empty/stale cache when the connection is bad.
-  // Force the backend for calls that do not explicitly choose a source.
-  function forceServerGet(proto) {
-    if (!proto || !proto.get || proto.__mtechServerGetWrapped) return;
-    var originalGet = proto.get;
-    proto.get = function (options) {
-      if (options == null) options = { source: "server" };
-      return originalGet.call(this, options);
-    };
-    proto.__mtechServerGetWrapped = true;
-  }
-
-  try {
-    forceServerGet(firebase.firestore.Query && firebase.firestore.Query.prototype);
-    forceServerGet(firebase.firestore.DocumentReference && firebase.firestore.DocumentReference.prototype);
-  } catch (err) {
-    console.warn("[M-TECH ADMIN FIRESTORE] Could not install server-read guard:", err && err.message);
-  }
+  // Dashboard reads keep the normal Firestore SDK behaviour. We verify
+  // successful CRUD writes against the server below, but do not globally
+  // force every read to source:"server" because a temporary transport failure
+  // would otherwise leave the whole dashboard blank.
 
   async function verifySaved(collection, id) {
     var snap = await db.collection(collection).doc(id).get({ source: "server" });
